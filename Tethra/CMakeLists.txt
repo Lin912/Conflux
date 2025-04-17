@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 设置项目名称
-project(Tethra5.0)
+project(Tethra5)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/exe/)
 #message(FATAL_ERROR  ${PROJECT_SOURCE_DIR})
@@ -42,7 +42,7 @@ set(SOURCE_FILES
 # 添加可执行文件
 add_executable(Tethra5 ${SOURCE_FILES})
 
-target_compile_definitions(Tethera5 PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+target_compile_definitions(Tethra5 PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 # 链接Eigen库
 target_link_libraries(Tethra5 Eigen3::Eigen spdlog::spdlog_header_only)
 

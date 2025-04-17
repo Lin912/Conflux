@@ -1,4 +1,4 @@
-#include "../Head/Add.h"
+#include "../include/Add.h"
 
 Add::Add(const VectorXd &arr, const VectorXd &brr, int index):Yold(arr), Ynew(brr)
 {

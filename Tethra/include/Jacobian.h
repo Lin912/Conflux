@@ -4,9 +4,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <vector>
-#include "../Head/MNQ.h"
-#include "../Head/ReadOut.h"
-#include "../Head/ParaReader.h"
+#include "../include/MNQ.h"
+#include "../include/ReadOut.h"
+#include "../include/ParaReader.h"
 
 class Jacobian
 {

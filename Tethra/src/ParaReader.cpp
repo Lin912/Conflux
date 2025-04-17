@@ -1,4 +1,4 @@
-#include "../Head/ParaReader.h"
+#include "../include/ParaReader.h"
 
 ParaReader::ParaReader(){}
 ParaReader::~ParaReader(){}

@@ -1,4 +1,4 @@
-#include "../Head/Iterator.h"
+#include "../include/Iterator.h"
 #include <Eigen/Dense>
 #include <cmath>
 #include <fstream>

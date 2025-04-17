@@ -1,4 +1,4 @@
-#include "../Head/MNQ.h"
+#include "../include/MNQ.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <cmath>
