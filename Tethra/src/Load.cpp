@@ -1,4 +1,4 @@
-#include "../include/Load.h"
+#include "Load.h"
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>

@@ -21,7 +21,7 @@ The code is written by the C++, before download the code you need:
 
 2.Download and install the Eigen library;
 
-3.Install Cmake and compile the source files according to CmakeLists in the Citrine5 folder. 
+3.Install Cmake and compile the source files according to CmakeLists in the Tethra folder. 
 
 Running the Tethra.exe and view the calculations result in the csv folder. The output.csv is the result file.
 Then viewing the graphical results with using the code in Python folder, the PostProcess folder includes the Force and Profile result.

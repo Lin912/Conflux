@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/BC.h"
+#include "BC.h"
 
 BC::BC(const Eigen::VectorXd &arr, const Eigen::VectorXd &brr):Yold(arr), Ynew(brr) {}
 
