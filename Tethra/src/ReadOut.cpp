@@ -4,16 +4,16 @@
 
 FiberRO::FiberRO()
     : fileTopVel("../bin/csv/TopVel.csv"), fileObject("../bin/csv/TowedObject.csv"),
-      fileBottomVelocityRelative("../../HydroSimulation/VelocityRelative.csv"),
-      fileBottomomegaRelative("../../HydroSimulation/omegaRelative.csv"),
-      fileBottomEulerAngle("../../HydroSimulation/EulerAngle.csv"),
+      fileBottomVelocityRelative("../../HydroSimulation/HydroData/VelocityRelative.csv"),
+      fileBottomomegaRelative("../../HydroSimulation/HydroData/omegaRelative.csv"),
+      fileBottomEulerAngle("../../HydroSimulation/HydroData/EulerAngle.csv"),
       fileWater("../bin/csv/Water.csv"), filePhysical("../bin/csv/Parameters.csv"),
       fileDelta("../bin/csv/Delta.csv"), Outfile("../bin/csv/output.csv") {
   std::filesystem::create_directory("../bin/csv");
   TotNoV = 500;
   // The .txt used to read into computation through udf
-  Topforceout = "../../HydroSimulation/topforce.txt";
-  Bottomforceout = "../../HydroSimulation/bottomforce.txt";
+  Topforceout = "../../HydroSimulation/TethraForces/topforce.txt";
+  Bottomforceout = "../../HydroSimulation/TethraForces/bottomforce.txt";
 }
 
 FiberRO::~FiberRO() {}

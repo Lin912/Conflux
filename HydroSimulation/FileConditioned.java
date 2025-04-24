@@ -16,12 +16,13 @@ import java.util.concurrent.locks.Condition;
 
 public class FileConditioned extends StarMacro {
 
-    private static final String FILE_PATH_BOTTOMFORCE = "/HydroSimulation/bottomforce.txt";
-    private static final String FILE_PATH_VELOCITYR = "/HydroSimulation/VelocityRelative.csv";
-    private static final String FILE_PATH_OMEGAR = "/HydroSimulation/omegaRelative.csv";
-    private static final String FILE_PATH_EULERANGLE = "/HydroSimulation/EulerAngle.csv";
+    private static final String FILE_PATH_BOTTOMFORCE = "../HydroSimulation/TethraForces/bottomforce.txt";
+    
+    private static final String FILE_PATH_VELOCITYR = "../HydroSimulation/HydroData/VelocityRelative.csv";
+    private static final String FILE_PATH_OMEGAR = "../HydroSimulation/HydroData/omegaRelative.csv";
+    private static final String FILE_PATH_EULERANGLE = "../HydroSimulation/HydroData/EulerAngle.csv";
 
-    private static final String FILE_SHARED = "/HydroSimulation/ControlDirect_SharedMemory";
+    private static final String FILE_SHARED = "../HydroSimulation/ControlDirect_SharedMemory";
     private static final int OFFSET_PROGRAM_STARCCM = 0;
     private static final int OFFSET_PROGRAM_CITRINE = 4;
     private static final int BUFFER_SIZE = 1024 + 8;
@@ -68,7 +69,7 @@ public class FileConditioned extends StarMacro {
                         double forceY = forceComponents[1];
                         double forceZ = forceComponents[2];
 
-                        ContinuumBody continuumBody = ((ContinuumBody) simulation.get(star.sixdof.BodyManager.class).getObject("BottomWeight"));//Body's Name
+                        ContinuumBody continuumBody = ((ContinuumBody) simulation.get(star.sixdof.BodyManager.class).getObject("MainBody"));//Body's Name
                         ExternalForce externalForce = ((ExternalForce) continuumBody.getExternalForceAndMomentManager().getObject("CableForce"));//Force's Name              
                         Units units_0 = ((Units) simulation.getUnitsManager().getObject("N"));
                         externalForce.getForce().setComponentsAndUnits(forceX, forceY, forceZ, units_0);//Force value
