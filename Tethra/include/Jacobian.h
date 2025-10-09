@@ -4,9 +4,10 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <vector>
-#include "../include/MNQ.h"
-#include "../include/ReadOut.h"
-#include "../include/ParaReader.h"
+#include "MNQ.h"
+#include "ReadOut.h"
+#include "ParaReader.h"
+#include "Nums.h"
 
 class Jacobian
 {
@@ -58,6 +59,7 @@ class Jacobian
         double Ay;
         double Az;
 
+        // int Timestep, Nodes, Variables, TnoV;
         int k;
         
 

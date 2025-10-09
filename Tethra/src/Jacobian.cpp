@@ -44,15 +44,20 @@ Jacobian::Jacobian(VectorXd& arr, VectorXd& brr, int index)
     Ax = physicalData.Ax;
     Ay = physicalData.Ay;
     Az = physicalData.Az;
+
+    // Timestep = physicalData.TS;
+    // Nodes = physicalData.NODES;
+    // Variables = physicalData.VARIABLES;
+    // TnoV = physicalData.TNOV;
 }
 
 Jacobian::~Jacobian() {}
 
 SparseMatrix<double> Jacobian::jacobian() {
 
-    SparseMatrix<double> temp(500, 500);
-    double cosY6 = cos(Ynew(6)), cosY7 = cos(Ynew(7)), cosY496 = cos(Ynew(496)), cosY497 = cos(Ynew(497));
-    double sinY6 = sin(Ynew(6)), sinY7 = sin(Ynew(7)), sinY496 = sin(Ynew(496)), sinY497 = sin(Ynew(497));
+    SparseMatrix<double> temp(TnoV, TnoV);
+    double cosY6 = cos(Ynew(6)), cosY7 = cos(Ynew(7)), cosYN96 = cos(Ynew(TnoV-4)), cosYN97 = cos(Ynew(TnoV-3));
+    double sinY6 = sin(Ynew(6)), sinY7 = sin(Ynew(7)), sinYN96 = sin(Ynew(TnoV-4)), sinYN97 = sin(Ynew(TnoV-3));
 
     std::vector<Triplet<double>> triplets;
 
@@ -67,21 +72,21 @@ SparseMatrix<double> Jacobian::jacobian() {
     triplets.push_back(Triplet<double>(3, 8, 1));
     triplets.push_back(Triplet<double>(4, 9, 1));
 
-    triplets.push_back(Triplet<double>(495, 490, 1));
-    triplets.push_back(Triplet<double>(495, 496, Vbz * cosY496 + Vbx * cosY497 * sinY496 + Vby * sinY497 * sinY496));
-    triplets.push_back(Triplet<double>(495, 497, Vbx * cosY496 * sinY497 - Vby * cosY497 * cosY496));
-    triplets.push_back(Triplet<double>(496, 491, 1));
-    triplets.push_back(Triplet<double>(496, 497, Vbx * cosY497 + Vby * sinY497));
-    triplets.push_back(Triplet<double>(497, 492, 1));
-    triplets.push_back(Triplet<double>(497, 496, Vbz * sinY496 - Vbx * cosY497 * cosY496 - Vby * cosY496 * sinY497));
-    triplets.push_back(Triplet<double>(497, 497, Vbx * sinY497 * sinY496 - Vby * cosY497 * sinY496));
-    triplets.push_back(Triplet<double>(498, 498, 1));
-    triplets.push_back(Triplet<double>(499, 499, 1));
+    triplets.push_back(Triplet<double>(TnoV-5, TnoV-10, 1));
+    triplets.push_back(Triplet<double>(TnoV-5, TnoV-4, Vbz * cosYN96 + Vbx * cosYN97 * sinYN96 + Vby * sinYN97 * sinYN96));
+    triplets.push_back(Triplet<double>(TnoV-5, TnoV-3, Vbx * cosYN96 * sinYN97 - Vby * cosYN97 * cosYN96));
+    triplets.push_back(Triplet<double>(TnoV-4, TnoV-9, 1));
+    triplets.push_back(Triplet<double>(TnoV-4, TnoV-3, Vbx * cosYN97 + Vby * sinYN97));
+    triplets.push_back(Triplet<double>(TnoV-3, TnoV-8, 1));
+    triplets.push_back(Triplet<double>(TnoV-3, TnoV-4, Vbz * sinYN96 - Vbx * cosYN97 * cosYN96 - Vby * cosYN96 * sinYN97));
+    triplets.push_back(Triplet<double>(TnoV-3, TnoV-3, Vbx * sinYN97 * sinYN96 - Vby * cosYN97 * sinYN96));
+    triplets.push_back(Triplet<double>(TnoV-2, TnoV-2, 1));
+    triplets.push_back(Triplet<double>(TnoV-1, TnoV-1, 1));
 
     temp.setFromTriplets(triplets.begin(), triplets.end());
 
     //Block01
-    for (int i = 0; i < 49; i++) {    
+    for (int i = 0; i < Nodes-1; i++) {    
         temp.coeffRef(i*10 + 5, i*10 + 0) = 2*M*deltaS + deltaS*deltaT*(0.5*Cdt*d0*pi*rho*abs(Ynew(i*10+ 0) + Vz*sin(Ynew(i*10+ 6)) - Vx*cos(Ynew(i*10+ 7))*cos(Ynew(i*10+ 6)) - Vy*cos(Ynew(i*10+ 6))*sin(Ynew(i*10+ 7)))*sqrt((Ynew(i*10+ 3)/(A*E) + 1)) + 0.5*Cdt*d0*pi*rho*sign(Ynew(i*10+ 0) + Vz*sin(Ynew(i*10+ 6)) - Vx*cos(Ynew(i*10+ 7))*cos(Ynew(i*10+ 6)) - Vy*cos(Ynew(i*10+ 6))*sin(Ynew(i*10+ 7)))*sqrt((Ynew(i*10+ 3)/(A*E) + 1))*(Ynew(i*10+ 0) + Vz*sin(Ynew(i*10+ 6)) - Vx*cos(Ynew(i*10+ 7))*cos(Ynew(i*10+ 6)) - Vy*cos(Ynew(i*10+ 6))*sin(Ynew(i*10+ 7))));
         temp.coeffRef(i*10 + 5, i*10 + 1) = M*deltaS*cos(Ynew(i*10+ 6))*(Yold(i*10+ 7) - Ynew(i*10+ 7));
         temp.coeffRef(i*10 + 5, i*10 + 2) = -M*deltaS*(Yold(i*10+ 6) - Ynew(i*10+ 6));
@@ -194,7 +199,7 @@ SparseMatrix<double> Jacobian::jacobian() {
     }
 
     //Block02
-    for(int i = 0; i < 49; i++)
+    for(int i = 0; i < Nodes-1; i++)
     {
         temp.coeffRef(i*10 + 5, i*10 + 10) = 2*M*deltaS + deltaS*deltaT*(0.5*Cdt*d0*pi*rho*abs(Ynew(i*10+ 10) + Vz*sin(Ynew(i*10+ 16)) - Vx*cos(Ynew(i*10+ 17))*cos(Ynew(i*10+ 16)) - Vy*cos(Ynew(i*10+ 16))*sin(Ynew(i*10+ 17)))*sqrt((Ynew(i*10+ 13)/(A*E) + 1)) + 0.5*Cdt*d0*pi*rho*sign(Ynew(i*10+ 10) + Vz*sin(Ynew(i*10+ 16)) - Vx*cos(Ynew(i*10+ 17))*cos(Ynew(i*10+ 16)) - Vy*cos(Ynew(i*10+ 16))*sin(Ynew(i*10+ 17)))*sqrt((Ynew(i*10+ 13)/(A*E) + 1))*(Ynew(i*10+ 10) + Vz*sin(Ynew(i*10+ 16)) - Vx*cos(Ynew(i*10+ 17))*cos(Ynew(i*10+ 16)) - Vy*cos(Ynew(i*10+ 16))*sin(Ynew(i*10+ 17))));
         temp.coeffRef(i*10 + 5, i*10 + 11) = M*deltaS*cos(Ynew(i*10+ 16))*(Yold(i*10+ 17) - Ynew(i*10+ 17));

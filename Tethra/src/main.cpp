@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <mutex>
 #include <condition_variable>
+#include "Nums.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -26,7 +27,11 @@ std::mutex mtx;
 std::condition_variable cv;
 
 int main(){
-  int timeForCitrine = 2000;
+  int timeForCitrine = 1166;
+
+  Eigen::initParallel();
+  Eigen::setNbThreads(THREADS);
+
   FiberMain fiberInstance;
 
   const char* filename = "../../../HydroSimulation/ControlDirect_SharedMemory";
@@ -59,23 +64,26 @@ int main(){
   while(true){
     // std::unique_lock<std::mutex> lock(mtx);//PorcessLOCK Off
 
-    while(sharedata -> OFFSET_PROGRAM_CITRINE == 0){
-      this_thread::sleep_for(chrono::milliseconds(10));
+    while(sharedata -> OFFSET_PROGRAM_CITRINE == 1){
+      SPDLOG_INFO("Data in Tethra");
+      fiberInstance.Calculation(timeForCitrine);
+      logMessage("Processing complete");
+      timeForCitrine++;
 
-      SPDLOG_INFO("Data in STAR-CCM+");
-      // cv.wait(lock);
+      sharedata -> OFFSET_PROGRAM_CITRINE = 0;
+      sharedata -> OFFSET_PROGRAM_STARCCM = 1;
+
+      // cv.notify_all();
     }
 
 
-    SPDLOG_INFO("Data in Tethra");
-    fiberInstance.Calculation(timeForCitrine);
-    logMessage("Processing complete");
-    timeForCitrine++;
+    
+    this_thread::sleep_for(chrono::milliseconds(1000));
 
-    sharedata -> OFFSET_PROGRAM_CITRINE = 0;
-    sharedata -> OFFSET_PROGRAM_STARCCM = 1;
+    SPDLOG_INFO("Data in STAR-CCM+");
+    // cv.wait(lock);
 
-    // cv.notify_all();
+
   }
 
 

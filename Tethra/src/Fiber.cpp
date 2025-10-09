@@ -1,9 +1,11 @@
 #include "Fiber.h"
 #include <spdlog/spdlog.h>
 
-FiberMain::FiberMain()
-    : times(1000), Error(1e-10), Nodes(50), TotNoV(500), TimeStep(10000),
-      DelTime(0.001) {}
+// FiberMain::FiberMain()
+//     : times(400), Error(1e-10), Nodes(100), TotNoV(1000), TimeStep(20000),
+//       DelTime(0.001) {}
+
+FiberMain::FiberMain() {}
 
 FiberMain::~FiberMain() {}
 
@@ -20,7 +22,7 @@ VectorXd FiberMain::initializeTransVal(int index) {
       a(i * 10 + 0) = 0; // u
       a(i * 10 + 1) = 0; // v
       a(i * 10 + 2) = 1e-30; // w
-      a(i * 10 + 3) = 3.490 + (Nodes - (i+1)) * 0.1573;     // T
+      a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.100;     // T
       a(i * 10 + 4) = 0;     // Sn
       a(i * 10 + 5) = 0;     // Sb
       a(i * 10 + 6) = 1e-11; // Theta
@@ -61,6 +63,6 @@ void FiberMain::Calculation(int index) {
 
   FiberRO a;
   a.Output(zero, TimeStep, TotNoV);
-  a.OutTopforce(TransVal);
+  // a.OutTopforce(TransVal);
   a.OutBottomforce(TransVal);
 }

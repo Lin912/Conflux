@@ -6,6 +6,7 @@
 #include "Load.h"
 #include "BC.h"
 #include "Add.h"
+#include "Nums.h"
 
 using namespace std;
 using namespace Eigen;

@@ -3,89 +3,498 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../bin/csv/TopVel.csv"), fileObject("../bin/csv/TowedObject.csv"),
-      fileBottomVelocityRelative("../../HydroSimulation/HydroData/VelocityRelative.csv"),
-      fileBottomomegaRelative("../../HydroSimulation/HydroData/omegaRelative.csv"),
-      fileBottomEulerAngle("../../HydroSimulation/HydroData/EulerAngle.csv"),
-      fileWater("../bin/csv/Water.csv"), filePhysical("../bin/csv/Parameters.csv"),
-      fileDelta("../bin/csv/Delta.csv"), Outfile("../bin/csv/output.csv") {
-  std::filesystem::create_directory("../bin/csv");
-  TotNoV = 500;
-  // The .txt used to read into computation through udf
-  Topforceout = "../../HydroSimulation/TethraForces/topforce.txt";
-  Bottomforceout = "../../HydroSimulation/TethraForces/bottomforce.txt";
+    : fileTopVel("../csv/TopVel4_A0.1T4.0_Z0.45_20s/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+      fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
+      fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
+      fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),
+      fileWater("../csv/Water.csv"), filePhysical("../csv/Parameters.csv"),
+      fileDelta("../csv/Delta.csv"), Outfile("../csv/output.csv"){
+      std::filesystem::create_directory("../csv");
+      // The .txt used to read into computation through udf
+      Topforceout = "../../../HydroSimulation/TethraForces/topforce.txt";
+      Bottomforceout = "../../../HydroSimulation/TethraForces/bottomforce.txt";
 }
 
 FiberRO::~FiberRO() {}
 
 vector<double> FiberRO::ReadTopVel(int k) {
-  ifstream infile(fileTopVel, ios::in);
-  if (!infile) {
-    cout << "Can not Open" + fileTopVel + ".csv" << endl;
-    exit(1);
-  }
-  vector<double> arrdata;
-  string line;
-  string field;
-  for (int i = 0; i <= k; i++) {
-    getline(infile, line);
-  }
-  stringstream sin(line);
-  // int colindex = 0;
-  while (getline(sin, field, ',')) {
-    double dvalue = atof(field.c_str());
-    arrdata.push_back(dvalue);
-  }
-  infile.close();
-  return arrdata;
+    std::ifstream infile(fileTopVel);
+    if (!infile.is_open()) {
+        std::cerr << "Error: cannot open file " << fileTopVel << ".csv" << std::endl;
+        return {};
+    }
+
+    string line;
+    for (int i = 0; i <= k; ++i) {
+        if (!std::getline(infile, line)) {
+            std::cerr << "Error: file has fewer than " << k + 1 << " lines\n";
+            return {};
+        }
+    }
+
+    vector<double> arrdata;
+    arrdata.reserve(32);
+
+    const char* ptr = line.c_str();
+    const char* end = ptr + line.size();
+
+    while (ptr < end) {
+        const char* next = std::find(ptr, end, ',');
+        double value = 0.0;
+        std::from_chars(ptr, next, value);
+        arrdata.push_back(value);
+        ptr = (next == end) ? end : next + 1;
+    }
+    return arrdata;
 }
 
 vector<double> FiberRO::ReadWater(int k) {
-  ifstream infile(fileWater, ios::in);
-  if (!infile) {
-    cout << "Can not Open" + fileWater + ".csv" << endl;
-    exit(1);
-  }
-  vector<double> arrdata;
-  string line;
-  string field;
-  for (int i = 0; i <= k; i++) {
-    getline(infile, line);
-  }
-  stringstream sin(line);
-  // int colindex = 0;
-  while (getline(sin, field, ',')) {
-    double dvalue = atof(field.c_str());
-    arrdata.push_back(dvalue);
-  }
-  infile.close();
-  return arrdata;
+    std::ifstream infile(fileWater);
+    if (!infile.is_open()) {
+        std::cerr << "Error: cannot open " << fileWater << ".csv" << std::endl;
+        return {};
+    }
+
+    std::string line;
+    for (int i = 0; i <= k; ++i) {
+        if (!std::getline(infile, line)) {
+            std::cerr << "Error: file has fewer than " << k + 1 << " lines\n";
+            return {};
+        }
+    }
+
+    std::vector<double> arrdata;
+    arrdata.reserve(32);
+
+    const char* ptr = line.c_str();
+    const char* end = ptr + line.size();
+
+    while (ptr < end) {
+        const char* next = std::find(ptr, end, ',');
+        double value = 0.0;
+        std::from_chars(ptr, next, value);
+        arrdata.push_back(value);
+        ptr = (next == end) ? end : next + 1;
+    }
+
+    return arrdata;
 }
 
-vector<double> FiberRO::readLastLineData(const string &filePath) {
-  ifstream file(filePath);
-  string line, lastLine;
-  while (getline(file, line)) {
-    if (!line.empty()) {
-      lastLine = line;
+vector<double> FiberRO::readLastLineData(const string& filePath) {
+    ifstream file(filePath, std::ios::binary | std::ios::ate);  
+    if (!file.is_open()) {
+        std::cerr << "Error: cannot open file " << filePath << std::endl;
+        return {};
+    }
+
+    std::streampos fileSize = file.tellg();
+    if (fileSize <= 0) {
+        std::cerr << "Warning: file is empty: " << filePath << std::endl;
+        return {};
+    }
+
+    size_t bufferSize = 1024;
+    std::string lastLine;
+
+    while (true) {
+        if (bufferSize > static_cast<size_t>(fileSize))
+            bufferSize = static_cast<size_t>(fileSize);
+
+        std::vector<char> buffer(bufferSize + 1, '\0');
+        file.seekg(-static_cast<std::streamoff>(bufferSize), std::ios::end);
+        file.read(buffer.data(), bufferSize);
+
+        char* lastNewline = std::strrchr(buffer.data(), '\n');
+
+        if (lastNewline) {
+            lastLine = lastNewline + 1;  
+            break;
+        } else if (bufferSize >= static_cast<size_t>(fileSize)) {
+            lastLine = buffer.data();
+            break;
+        } else {
+            bufferSize *= 2;
+        }
+    }
+
+    return ParseCSVLine(lastLine.c_str());
+}
+
+vector<double> FiberRO::ParseCSVLine(const char* lineStart) {
+    vector<double> result;
+    const char* ptr = lineStart;
+    const char* end = lineStart + std::strlen(lineStart);
+    result.reserve(16); 
+
+    while (ptr < end) {
+        const char* next = std::find(ptr, end, ',');
+        double value = 0.0;
+        auto [p, ec] = std::from_chars(ptr, next, value);
+        if (ec == std::errc())
+            result.push_back(value);
+        ptr = (next == end) ? end : next + 1;
+    }
+    return result;
+}
+
+VectorXd FiberRO::ReadTheLastRow(int index) {
+    SPDLOG_DEBUG("Reading the last row of the file with index {}", index);
+    ifstream infile(Outfile);
+    
+    if (!infile.is_open()) {
+        SPDLOG_ERROR("Failed to open file: {}", Outfile);
+        throw std::runtime_error("Cannot open file: " + Outfile);
+    }
+
+    string line;
+
+    for (int i = 0; i <= index; ++i) {
+        if (!std::getline(infile, line)) {
+            SPDLOG_ERROR("Failed to read line {} from file {}", i, Outfile);
+            throw std::runtime_error("Insufficient lines in file");
+        }
+    }
+    infile.close();
+    return ParseCSVLineToVector(line);
+}
+
+VectorXd FiberRO::ParseCSVLineToVector(const string& line) {
+    size_t columnCount = 1;
+    for (char c : line) {
+        if (c == ',') ++columnCount;
+    }
+    
+    VectorXd result(columnCount);
+    size_t startPos = 0;
+    size_t endPos = 0;
+    size_t colIndex = 0;
+    
+    while (colIndex < columnCount) {
+        endPos = line.find(',', startPos);
+        
+        if (endPos == string::npos) {
+            result(colIndex) = FastStod(line.substr(startPos));
+            break;
+        }
+        result(colIndex++) = FastStod(line.substr(startPos, endPos - startPos));
+        startPos = endPos + 1;
+    }
+    return result;
+}
+
+double FiberRO::FastStod(const string& str) {
+    char* endptr;
+    double value = strtod(str.c_str(), &endptr);
+    
+    if (endptr == str.c_str() || *endptr != '\0') {
+        SPDLOG_WARN("Invalid numeric value: '{}', using 0.0", str);
+        return 0.0;
+    }
+    return value;
+}
+
+MatrixXd FiberRO::readCSV(int row) {
+    SPDLOG_DEBUG("Reading the first {} rows of the file", row);
+    ifstream infile(Outfile);
+    if (!infile.is_open()) {
+        SPDLOG_ERROR("Failed to open file: {}", Outfile);
+        throw runtime_error("Cannot open file: " + Outfile);
+    }
+
+    vector<vector<double>> data;
+    data.reserve(row);
+    string line;
+    int currentRow = 0;
+    size_t expectedCols = 0;
+    
+    while (currentRow < row && getline(infile, line)) {
+        if (line.empty()) continue;
+        vector<double> rowData;
+        if (currentRow == 0) {
+            expectedCols = CountColumns(line);
+            rowData.reserve(expectedCols);
+        } else {
+            rowData.reserve(expectedCols);
+        }
+        ParseCSVLine(line, rowData);
+        if (currentRow > 0 && rowData.size() != expectedCols) {
+            SPDLOG_WARN("Row {} has {} columns, expected {}", 
+                       currentRow, rowData.size(), expectedCols);
+        }
+        
+        data.push_back(move(rowData));
+        ++currentRow;
+    }
+    
+    if (data.empty()) {
+        SPDLOG_WARN("No data read from file");
+        return MatrixXd(0, 0);
+    }
+    return ConvertToEigenMatrix(data);
+}
+
+size_t FiberRO::CountColumns(const string& line) { return count(line.begin(), line.end(), ',') + 1;}
+
+void FiberRO::ParseCSVLine(const string& line, vector<double>& rowData) {
+    size_t start = 0;
+    size_t end = 0;
+    
+    while ((end = line.find(',', start)) != string::npos) {
+        string_view field(&line[start], end - start);
+        if (!field.empty()) {
+            rowData.push_back(FastStod(field));
+        } else {
+            rowData.push_back(0.0);
+        }
+        start = end + 1;
+    }
+    
+    if (start < line.length()) {
+        string_view field(&line[start], line.length() - start);
+        if (!field.empty()) {
+            rowData.push_back(FastStod(field));
+        } else {
+            rowData.push_back(0.0);
+        }
+    }
+}
+
+double FiberRO::FastStod(string_view str) {
+    char* endptr;
+    double value = strtod(str.data(), &endptr);
+    
+    if (endptr == str.data() || endptr != str.data() + str.length()) {
+        SPDLOG_WARN("Invalid numeric value: '{}', using 0.0", str);
+        return 0.0;
+    }
+    return value;
+}
+
+MatrixXd FiberRO::ConvertToEigenMatrix(const vector<vector<double>>& data) {
+    if (data.empty()) return MatrixXd(0, 0);
+    
+    const size_t rows = data.size();
+    const size_t cols = data[0].size();
+    MatrixXd matrix(rows, cols);
+    
+    for (size_t i = 0; i < rows; ++i) {
+        if (data[i].size() != cols) {
+            for (size_t j = 0; j < cols; ++j) {
+                matrix(i, j) = (j < data[i].size()) ? data[i][j] : 0.0;
+            }
+        } else {
+            Map<const VectorXd> rowMap(data[i].data(), cols);
+            matrix.row(i) = rowMap;
+        }
+    }
+    return matrix;
+}
+
+vector<double> FiberRO::ReadCSVLine(const string& filename, int lineIndex) {
+        vector<double> arrdata;
+  
+        ifstream infile(filename);
+        if (!infile.is_open()) {
+            throw std::runtime_error("Could not open file: " + filename);
+        }
+
+        string line;
+        for (int i = 0; i <= lineIndex; i++) {
+            if (!std::getline(infile, line)) {
+                throw std::runtime_error("File does not have line " + std::to_string(lineIndex));
+            }
+        }
+
+        stringstream sin(line);
+        string field;
+        
+        while (getline(sin, field, ',')) {
+            try {
+                arrdata.push_back(std::stod(field));
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Invalid number format in file: " + filename);
+            }
+        }
+        return arrdata;
+}
+
+vector<double> FiberRO::ReadBottomG() { return ReadCSVLine(fileObject, 1);}
+
+vector<double> FiberRO::ReadPhysical() { return ReadCSVLine(filePhysical, 1);}
+
+vector<double> FiberRO::ReadDelta() {return ReadCSVLine(fileDelta, 1);}
+
+void FiberRO::Output(const MatrixXd &arr, int rr, int ll) {
+    SPDLOG_DEBUG("Outputting matrix({},{}) to file with {} rows and {} columns",
+                arr.rows(), arr.cols(), rr, ll);
+    
+    ofstream datafile(Outfile, std::ios::out | std::ios::trunc);
+    if (!datafile.is_open()) {
+        SPDLOG_ERROR("Failed to open output file: {}", Outfile);
+        throw runtime_error("Cannot open output file: " + Outfile);
+    }
+
+    const int outputRows = min(static_cast<int>(arr.rows()), rr);
+    const int outputCols = min(static_cast<int>(arr.cols()), ll);
+    const string zeroRow = CreateZeroRow(ll);
+    
+    ostringstream lineBuffer;
+    lineBuffer.rdbuf()->pubsetbuf(nullptr, 0);    
+    for (int i = 0; i < outputRows; ++i) {
+        SPDLOG_TRACE("Writing row {}", i);
+        
+        lineBuffer.str(""); 
+        lineBuffer.clear();
+        
+        for (int j = 0; j < outputCols; ++j) {
+            lineBuffer << arr(i, j);
+            if (j < outputCols - 1) {
+                lineBuffer << ",";
+            }
+        }
+        
+        if (outputCols < ll) {
+            if (outputCols > 0) lineBuffer << ",";
+            for (int j = outputCols; j < ll; ++j) {
+                lineBuffer << "0";
+                if (j < ll - 1) {
+                    lineBuffer << ",";
+                }
+            }
+        }
+        datafile << lineBuffer.str() << "\n";
+    }
+    
+    if (rr > outputRows) {
+        for (int i = outputRows; i < rr; ++i) {
+            datafile << zeroRow << "\n";
+        }
+    }
+    SPDLOG_DEBUG("Successfully wrote {} rows to file", rr);
+}
+
+string FiberRO::CreateZeroRow(int cols) {
+    if (cols <= 0) return "";
+    
+    string zeroRow;
+    zeroRow.reserve(cols * 2 - 1); 
+
+    for (int j = 0; j < cols; ++j) {
+        zeroRow += '0';
+        if (j < cols - 1) {
+            zeroRow += ',';
+        }
+    }
+    return zeroRow;
+}
+
+double FiberRO::flutov(char *filename) {
+  double num;
+  string s;
+  string lastLine;
+  ifstream file(filename);
+  if (file.is_open()) {
+    while (getline(file, s)) {
+      lastLine = s;
+    }
+    file.close();
+  } else {}
+  try {
+    int pos = lastLine.find(' ');
+    num = stod(lastLine.substr(pos + 1));
+  } catch (const std::exception &e) {}
+  return num;
+}
+
+void FiberRO::OutTopforce(VectorXd v) {
+  // SPDLOG_DEBUG("Outputting the top force to file");
+  ofstream outfileTopforce(Topforceout, ios::trunc);
+  
+  MatrixXd aa(1, 3);
+  aa(0, 0) = v(3); // Forcet
+  aa(0, 1) = v(4); // Forcen
+  aa(0, 2) = v(5); // Forceb
+  //////////////////////////////////////////////////////////////////
+  MatrixXd tpmat(3, 3);
+  tpmat(0, 0) = cos(v(7)) * cos(v(6));
+  tpmat(0, 1) = sin(v(7)) * cos(v(6));
+  tpmat(0, 2) = -sin(v(6));
+  tpmat(1, 0) = -sin(v(7));
+  tpmat(1, 1) = cos(v(7));
+  
+  tpmat(1, 2) = 0;
+  tpmat(2, 0) = sin(v(6)) * cos(v(7));
+  tpmat(2, 1) = sin(v(6)) * sin(v(7));
+  tpmat(2, 2) = cos(v(6));
+  //////////////////////////////////////////////////////////////////
+  
+  MatrixXd bb(1, 3);
+  bb = aa * tpmat.inverse();
+  outfileTopforce << bb;
+  outfileTopforce.close();
+}
+
+void FiberRO::OutBottomforce(VectorXd v) {
+  // SPDLOG_DEBUG("Outputting the bottom force to file");
+  ofstream outfileBottomforce(Bottomforceout, ios::trunc);
+
+  MatrixXd aa(1, 3);
+  aa(0, 0) = v(TnoV-7); // Ft
+  aa(0, 1) = v(TnoV-6); // Fn
+  aa(0, 2) = v(TnoV-5); // Fb
+  ///////////////////////////////////////////////////////////////////
+  MatrixXd tpmat(3, 3);
+  tpmat(0, 0) = cos(v(TnoV-3)) * cos(v(TnoV-4));
+  tpmat(0, 1) = sin(v(TnoV-3)) * cos(v(TnoV-4));
+  tpmat(0, 2) = -sin(v(TnoV-4));
+  tpmat(1, 0) = -sin(v(TnoV-3));
+  tpmat(1, 1) = cos(v(TnoV-3));
+  tpmat(1, 2) = 0;
+  tpmat(2, 0) = sin(v(TnoV-4)) * cos(v(TnoV-3));
+  tpmat(2, 1) = sin(v(TnoV-4)) * sin(v(TnoV-3));
+  tpmat(2, 2) = cos(v(TnoV-4));
+  ///////////////////////////////////////////////////////////////////
+
+  MatrixXd bb(1, 3);
+  bb = aa * tpmat.inverse();
+  outfileBottomforce << bb;
+  outfileBottomforce.close();
+}
+
+vector<double> FiberRO::ReadBottomVel() {
+  vector<double> velocityRelative =
+      readLastLineData(fileBottomVelocityRelative);
+  vector<double> omegaRelative = readLastLineData(fileBottomomegaRelative);
+  vector<double> Eulerangle = readLastLineData(fileBottomEulerAngle);
+  ////////////////////////////////////////////////////Towingpoint Position
+  vector<double> R = {-0.22, 0.0, -0.00497};
+  ////////////////////////////////////////////////////Towingpoint Position
+
+  Matrix3x3 E = computeRotationMatrix(Eulerangle);
+
+  vector<double> crossProduct = {
+      omegaRelative[1] * R[2] - omegaRelative[2] * R[1],
+      omegaRelative[2] * R[0] - omegaRelative[0] * R[2],
+      omegaRelative[0] * R[1] - omegaRelative[1] * R[0]};
+
+  vector<double> brrdata(3, 0.0);
+  for (size_t i = 0; i < 3; ++i) {
+    if (i == 1) {
+      brrdata[i] = velocityRelative[i] + crossProduct[i];
+    } else {
+      brrdata[i] = velocityRelative[i] + crossProduct[i];
     }
   }
-  file.close();
 
-  vector<double> data;
-  stringstream ss(lastLine);
-  string value;
-  while (getline(ss, value, ',')) {
-    try {
-      data.push_back(stod(value));
-    } catch (const invalid_argument &) {
+  vector<double> arrdata(3, 0.0);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      arrdata[i] += E[i][j] * brrdata[j];
     }
   }
-
-  if (data.size() > 3) {
-    data.erase(data.begin(), data.end() - 3);
-  }
-  return data;
+  // swap(arrdata[1], arrdata[2]);
+  // swap(arrdata[0], arrdata[1]);
+  return arrdata;
 }
 
 Matrix3x3 FiberRO::computeRotationMatrix(const vector<double> &Eulerangle) {
@@ -119,306 +528,4 @@ Matrix3x3 FiberRO::computeRotationMatrix(const vector<double> &Eulerangle) {
     }
   }
   return E;
-}
-
-vector<double> FiberRO::ReadBottomVel() {
-  vector<double> velocityRelative =
-      readLastLineData(fileBottomVelocityRelative);
-  vector<double> omegaRelative = readLastLineData(fileBottomomegaRelative);
-  vector<double> Eulerangle = readLastLineData(fileBottomEulerAngle);
-  ////////////////////////////////////////////////////Towingpoint Position
-  vector<double> R = {-0.0465, 0.0, 0.0};
-  ////////////////////////////////////////////////////Towingpoint Position
-
-  Matrix3x3 E = computeRotationMatrix(Eulerangle);
-
-  vector<double> crossProduct = {
-      omegaRelative[1] * R[2] - omegaRelative[2] * R[1],
-      omegaRelative[2] * R[0] - omegaRelative[0] * R[2],
-      omegaRelative[0] * R[1] - omegaRelative[1] * R[0]};
-
-  vector<double> brrdata(3, 0.0);
-  for (size_t i = 0; i < 3; ++i) {
-    if (i == 1) {
-      brrdata[i] = velocityRelative[i] + crossProduct[i];
-    } else {
-      brrdata[i] = velocityRelative[i] + crossProduct[i];
-    }
-  }
-
-  vector<double> arrdata(3, 0.0);
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      arrdata[i] += E[i][j] * brrdata[j];
-    }
-  }
-  // swap(arrdata[1], arrdata[2]);
-  // swap(arrdata[0], arrdata[1]);
-
-  return arrdata;
-}
-
-VectorXd FiberRO::ReadTheLastRow(int index) {
-  SPDLOG_DEBUG("Reading the last row of the file with index {}", index);
-  Matrix<double, 500, 1> arrcol;
-  arrcol.setZero();
-  VectorXd TransVal(TotNoV);
-
-  ifstream infile(Outfile);
-  if (!infile) {
-    cerr << "Open file " + Outfile + " failed" << endl;
-    exit(1);
-  }
-
-  string line;
-  for (int i = 0; i <= index; i++) {
-    if (!getline(infile, line)) {
-      cerr << "Failed to read line " << i << " from file." << endl;
-      infile.close();
-      exit(1);
-    }
-  }
-
-  stringstream sin(line);
-  string field;
-  int colindex = 0;
-
-  while (getline(sin, field, ',')) {
-    if (colindex >= 500) {
-      cerr << "Too many columns in the input line." << endl;
-      break;
-    }
-    double dvalue = stod(field);
-    arrcol(colindex, 0) = dvalue;
-    colindex++;
-  }
-  infile.close();
-
-  for (int i = 0; i < TotNoV; i++) {
-    TransVal(i) = arrcol(i, 0);
-  }
-
-  return TransVal;
-}
-
-MatrixXd FiberRO::readCSV(int row) {
-  SPDLOG_DEBUG("Reading the first {} rows of the file", row);
-  ifstream infile(Outfile);
-  string line;
-  vector<vector<double>> data;
-
-  int currentRow = 0;
-  while (getline(infile, line) && currentRow < row) {
-    istringstream iss(line);
-    vector<double> rowData;
-
-    string valueStr;
-    while (getline(iss, valueStr, ',')) {
-      double value = stod(valueStr);
-      rowData.push_back(value);
-    }
-
-    data.push_back(rowData);
-    ++currentRow;
-  }
-
-  MatrixXd matrix(data.size(), data[0].size());
-  for (int i = 0; i < data.size(); ++i) {
-    for (int j = 0; j < data[i].size(); ++j) {
-      matrix(i, j) = data[i][j];
-    }
-  }
-
-  return matrix;
-}
-
-void FiberRO::OutTopforce(VectorXd v) {
-  // SPDLOG_DEBUG("Outputting the top force to file");
-  ofstream outfileTopforce(Topforceout, ios::trunc);
-  MatrixXd aa(1, 3);
-  // SPDLOG_DEBUG("exmaple log 0");
-  aa(0, 0) = v(3); // Forcet
-  aa(0, 1) = v(4); // Forcen
-  aa(0, 2) = v(5); // Forceb
-  // SPDLOG_DEBUG("exmaple log 1");
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  MatrixXd tpmat(3, 3);
-  tpmat(0, 0) = cos(v(7)) * cos(v(6));
-  tpmat(0, 1) = sin(v(7)) * cos(v(6));
-  tpmat(0, 2) = -sin(v(6));
-  tpmat(1, 0) = -sin(v(7));
-  tpmat(1, 1) = cos(v(7));
-  // SPDLOG_DEBUG("exmaple log 2");
-  tpmat(1, 2) = 0;
-  tpmat(2, 0) = sin(v(6)) * cos(v(7));
-  tpmat(2, 1) = sin(v(6)) * sin(v(7));
-  tpmat(2, 2) = cos(v(6));
-  // SPDLOG_DEBUG("exmaple log 3");
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  MatrixXd bb(1, 3);
-  bb = aa * tpmat.inverse();
-  outfileTopforce << bb;
-  outfileTopforce.close();
-}
-
-void FiberRO::OutBottomforce(VectorXd v) {
-  SPDLOG_DEBUG("Outputting the bottom force to file");
-  ofstream outfileBottomforce(Bottomforceout, ios::trunc);
-  MatrixXd aa(1, 3);
-  aa(0, 0) = v(493); // Ft
-  aa(0, 1) = v(494); // Fn
-  aa(0, 2) = v(495); // Fb
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  MatrixXd tpmat(3, 3);
-  tpmat(0, 0) = cos(v(497)) * cos(v(496));
-  tpmat(0, 1) = sin(v(497)) * cos(v(496));
-  tpmat(0, 2) = -sin(v(496));
-  tpmat(1, 0) = -sin(v(497));
-  tpmat(1, 1) = cos(v(497));
-  tpmat(1, 2) = 0;
-  tpmat(2, 0) = sin(v(496)) * cos(v(497));
-  tpmat(2, 1) = sin(v(496)) * sin(v(497));
-  tpmat(2, 2) = cos(v(496));
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  MatrixXd bb(1, 3);
-  bb = aa * tpmat.inverse();
-  outfileBottomforce << bb;
-  outfileBottomforce.close();
-}
-
-vector<double> FiberRO::ReadBottomG() {
-  vector<double> arrdata;
-  int index = 1;
-
-  ifstream infile(fileObject, ios::in);
-  if (!infile) {
-    cout << "Could not Open" + fileObject + ".csv" << endl;
-    exit(1);
-  }
-
-  string line;
-  string field;
-  for (int i = 0; i <= index; i++) {
-    getline(infile, line);
-  }
-  stringstream sin(line);
-  // int colindex = 0;
-  while (getline(sin, field, ',')) {
-    double dvalue = atof(field.c_str());
-    arrdata.push_back(dvalue);
-  }
-  infile.close();
-
-  return arrdata;
-}
-
-vector<double> FiberRO::ReadPhysical() {
-  vector<double> arrdata;
-  int index = 1;
-
-  ifstream infile(filePhysical, ios::in);
-  if (!infile) {
-    cout << "Could not Open" + filePhysical + ".csv" << endl;
-    exit(1);
-  }
-
-  string line;
-  string field;
-  for (int i = 0; i <= index; i++) {
-    getline(infile, line);
-  }
-  stringstream sin(line);
-  // int colindex = 0;
-  while (getline(sin, field, ',')) {
-    double dvalue = atof(field.c_str());
-    arrdata.push_back(dvalue);
-  }
-  infile.close();
-
-  return arrdata;
-}
-
-vector<double> FiberRO::ReadDelta() {
-  vector<double> arrdata;
-  int index = 1;
-
-  ifstream infile(fileDelta, ios::in);
-  if (!infile) {
-    cout << "Could not Open" + fileDelta + ".csv" << endl;
-    exit(1);
-  }
-
-  string line;
-  string field;
-  for (int i = 0; i <= index; i++) {
-    getline(infile, line);
-  }
-  stringstream sin(line);
-  int colindex = 0;
-  while (getline(sin, field, ',')) {
-    double dvalue = atof(field.c_str());
-    arrdata.push_back(dvalue);
-  }
-  infile.close();
-
-  return arrdata;
-}
-
-void FiberRO::Output(const MatrixXd &arr, int rr, int ll) {
-  SPDLOG_DEBUG(
-      "Outputting the matrix({},{}) to file with {} rows and {} columns",
-      arr.rows(), arr.cols(), rr, ll);
-  ofstream datafile;
-  datafile.open(Outfile.c_str(), ios::out | ios::trunc);
-  auto rows = min(static_cast<int>(arr.rows()), rr);
-  auto cols = min(static_cast<int>(arr.cols()), ll);
-  for (int i = 0; i < rows; i++) {
-      SPDLOG_DEBUG("Writing row {}", i);
-      for (int j = 0; j < cols; j++) {
-        datafile << arr(i, j);
-        if (j < cols -1 || j < ll - 1){
-        datafile << ",";}
-      }
-      for (int j = cols; j < ll; j++) {
-        datafile << 0;
-        if (j < ll -1){
-          datafile << ",";
-        }
-      }
-      datafile << endl;
-  }
-  for (int i = rows; i < rr; i++) {
-    for (int j = 0; j < ll; j++) {
-      datafile << 0;
-      if (j < ll -1){
-        datafile << ",";
-      }
-    }
-    datafile << endl;
-  }
-  SPDLOG_DEBUG("Closing the file");
-  datafile.close();
-}
-
-double FiberRO::flutov(char *filename) {
-
-  double num;
-  string s;
-  string lastLine;
-  ifstream file(filename);
-  if (file.is_open()) {
-    while (getline(file, s)) {
-      lastLine = s;
-    }
-    file.close();
-  } else {
-  }
-  try {
-    int pos = lastLine.find(' ');
-    num = stod(lastLine.substr(pos + 1));
-  } catch (const std::exception &e) {
-  }
-  return num;
 }

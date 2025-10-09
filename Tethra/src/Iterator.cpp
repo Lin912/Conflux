@@ -79,7 +79,7 @@ void Iterator::saveIterationResults(int iteration) {
 double Iterator::calculateMaxIncrementalPercentage(const VectorXd &deltaY) {
   SPDLOG_DEBUG("Calculating max incremental percentage");
   double amax = 0;
-  for (int i = 10; i < 489; i++) {
+  for (int i = 10; i < TnoV-11; i++) {
     if (Yold(i) != 0) {
       double a = abs(deltaY(i)) / abs(Yold(i));
       amax = std::max(amax, a);
@@ -90,7 +90,7 @@ double Iterator::calculateMaxIncrementalPercentage(const VectorXd &deltaY) {
 
 double Iterator::calculateMaxFx() {
   double bmax = 0;
-  for (int i = 10; i < 489; i++) {
+  for (int i = 10; i < TnoV-11; i++) {
     bmax = std::max(bmax, abs(fx(i)));
   }
   return bmax;

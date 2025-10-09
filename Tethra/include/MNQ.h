@@ -7,6 +7,7 @@
 #include <vector>
 #include "ReadOut.h"
 #include "ParaReader.h"
+#include "Nums.h"
 
 
 
@@ -24,6 +25,7 @@ class MNQ
         double Vx, Vy, Vz, Vtx, Vty, Vtz, Vbx, Vby, Vbz;
         double deltaT, deltaS;
         double Gbx, Gby, Gbz, Ax, Ay, Az;
+        // int Timestep, Nodes, Variables, TnoV;
 
         // 稀疏矩阵的计算方法
         Eigen::SparseMatrix<double> CreateSparseMatrix(const Eigen::VectorXd& Y);

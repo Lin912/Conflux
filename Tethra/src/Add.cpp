@@ -12,6 +12,11 @@ Add::Add(const VectorXd &arr, const VectorXd &brr, int index):Yold(arr), Ynew(br
     Vbx = physicalData.Vbx;
     Vby = physicalData.Vby;
     Vbz = physicalData.Vbz;
+
+    // Timestep = physicalData.TS;
+    // Nodes = physicalData.NODES;
+    // Variables = physicalData.VARIABLES;
+    // TnoV = physicalData.TNOV;
 }
 
 Add::~Add() {}
@@ -28,15 +33,15 @@ Vector3d Add::calculatePoint00(const VectorXd& Y)
 Vector3d Add::calculatePoint02(const VectorXd& Y)
 {
     Vector3d point;
-    point(0) = Vbx*cos(Y(497))*cos(Y(496)) + Vby*cos(Y(496))*sin(Y(497)) - Vbz*sin(Y(496));
-    point(1) = Vby*cos(Y(497)) - Vbx*sin(Y(497));
-    point(2) = Vbx*cos(Y(497))*sin(Y(496)) + Vby*sin(Y(496))*sin(Y(497)) + Vbz*cos(Y(496));
+    point(0) = Vbx*cos(Y(Variables*(Nodes-1)+7))*cos(Y(Variables*(Nodes-1)+6)) + Vby*cos(Y(Variables*(Nodes-1)+6))*sin(Y(Variables*(Nodes-1)+7)) - Vbz*sin(Y(Variables*(Nodes-1)+6));
+    point(1) = Vby*cos(Y(Variables*(Nodes-1)+7)) - Vbx*sin(Y(Variables*(Nodes-1)+7));
+    point(2) = Vbx*cos(Y(Variables*(Nodes-1)+7))*sin(Y(Variables*(Nodes-1)+6)) + Vby*sin(Y(Variables*(Nodes-1)+6))*sin(Y(Variables*(Nodes-1)+7)) + Vbz*cos(Y(Variables*(Nodes-1)+6));
     return point;
 }
 
 VectorXd Add::Addyold()
 {
-    VectorXd temp(500);
+    VectorXd temp(TnoV);
 
     Vector3d point00 = calculatePoint00(Yold);
     VectorXd point01(2);
@@ -48,9 +53,9 @@ VectorXd Add::Addyold()
     temp.segment(0, 3) = point00;
     temp.segment(3, 5) = Yold.segment(3, 5);
     temp.segment(8, 2) = point01;
-    temp.segment(10, 480) = Yold.segment(10, 480);
-    temp.segment(490, 3) = point02;
-    temp.segment(493, 5) = Yold.segment(493, 5);
+    temp.segment(10, TnoV-20) = Yold.segment(10, TnoV-20);
+    temp.segment(TnoV-10, 3) = point02;
+    temp.segment(TnoV-7, 5) = Yold.segment(TnoV-7, 5);
     temp.tail(2) = point03;
 
     return temp;
@@ -58,7 +63,7 @@ VectorXd Add::Addyold()
 
 VectorXd Add::Addynew()
 {
-    VectorXd temp(500);
+    VectorXd temp(TnoV);
 
     Vector3d point00 = calculatePoint00(Ynew);
     VectorXd point01(2);
@@ -70,9 +75,9 @@ VectorXd Add::Addynew()
     temp.segment(0, 3) = point00;
     temp.segment(3, 5) = Ynew.segment(3, 5);
     temp.segment(8, 2) = point01;
-    temp.segment(10, 480) = Ynew.segment(10, 480);
-    temp.segment(490, 3) = point02;
-    temp.segment(493, 5) = Ynew.segment(493, 5);
+    temp.segment(10, TnoV-20) = Ynew.segment(10, TnoV-20);
+    temp.segment(TnoV-10, 3) = point02;
+    temp.segment(TnoV-7, 5) = Ynew.segment(TnoV-7, 5);
     temp.tail(2) = point03;
 
     return temp;

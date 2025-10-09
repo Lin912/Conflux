@@ -7,16 +7,17 @@
 #include <vector>
 #include "Iterator.h"
 #include "ReadOut.h"
+#include "Nums.h"
 
 class FiberMain
 {
 private:
-    int times;                // Iteration times
-    double Error;             // Convergence error
-    int Nodes;                // Number of nodes
-    int TotNoV;               // Total number of variables
-    int TimeStep;             // Number of time steps
-    double DelTime;           // Time step interval
+    // int times;                // Iteration times
+    // double Error;             // Convergence error
+    // int Nodes;                // Number of nodes
+    // int TotNoV;               // Total number of variables
+    // int TimeStep;             // Number of time steps
+    // double DelTime;           // Time step interval
 
     VectorXd initializeTransVal(int index);
     MatrixXd initializeZeroMatrix();             

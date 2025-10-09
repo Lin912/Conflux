@@ -45,6 +45,11 @@ Fx::Fx(VectorXd& arr, VectorXd& brr, int index)
     Ax = physicalData.Ax;
     Ay = physicalData.Ay;
     Az = physicalData.Az;
+
+    // Timestep = physicalData.TS;
+    // Nodes = physicalData.NODES;
+    // Variables = physicalData.VARIABLES;
+    // TnoV = physicalData.TNOV;
 }
 
 Fx::~Fx()
@@ -52,8 +57,8 @@ Fx::~Fx()
 }
 
 VectorXd Fx::fx() {
-    int numSegments = 50;
-    int segmentSize = 10;
+    int numSegments = Nodes;
+    int segmentSize = Variables;
 
     std::vector<VectorXd> Yold_segments(numSegments, VectorXd::Zero(segmentSize));
     std::vector<VectorXd> Ynew_segments(numSegments, VectorXd::Zero(segmentSize));
@@ -185,7 +190,7 @@ VectorXd Fx::fx() {
     SPDLOG_DEBUG("FX LOG 5");
 
     // 创建最终的返回向量 ret
-    VectorXd ret(500);
+    VectorXd ret(numSegments*segmentSize);
     
     // 将前五个元素赋值为 BCtemp0，尾部五个元素赋值为 BCtemp1
     ret.head(5) = BCtemp0;

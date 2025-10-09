@@ -50,5 +50,23 @@ PhysicalData ParaReader::ReadAllPhysicalData(FiberRO& a, int index)
         data.Ax = bottomG[3];
         data.Ay = bottomG[4];
         data.Az = bottomG[5];
+
+        // auto Nums = a.ReadNums();
+        // data.TS = Nums[0];
+        // data.NODES = Nums[1];
+        // data.VARIABLES = Nums[2];
+        // data.TNOV = Nums[3];
+
         return data;
 }
+
+// NumData ParaReader::ReadNumData(FiberRO& a){
+//         NumData data;
+//         auto Nums = a.ReadNums();
+//         data.TS = Nums[0];
+//         data.NODES = Nums[1];
+//         data.VARIABLES = Nums[2];
+//         data.TNOV = Nums[3]; 
+
+//         return data;
+// }

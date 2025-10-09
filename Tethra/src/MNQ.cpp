@@ -46,15 +46,20 @@ MNQ::MNQ(const VectorXd &arr, const VectorXd &brr, int index)
   Ax = physicalData.Ax;
   Ay = physicalData.Ay;
   Az = physicalData.Az;
+
+//   Timestep = physicalData.TS;
+//   Nodes = physicalData.NODES;
+//   Variables = physicalData.VARIABLES;
+//   TnoV = physicalData.TNOV;
 }
 
 MNQ::~MNQ() {}
 
 Eigen::SparseMatrix<double> MNQ::CreateSparseMatrix(const Eigen::VectorXd &Y) {
-  Eigen::SparseMatrix<double> temp(500, 500);
+  Eigen::SparseMatrix<double> temp(TnoV, TnoV);
   std::vector<Eigen::Triplet<double>> triplets;
 
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < Nodes; i++) {
     int idx0 = i * 10 + 0;
     int idx1 = i * 10 + 1;
     int idx2 = i * 10 + 2;
@@ -107,10 +112,10 @@ Eigen::SparseMatrix<double> MNQ::Mold() { return CreateSparseMatrix(Yold); }
 Eigen::SparseMatrix<double> MNQ::Mnew() { return CreateSparseMatrix(Ynew); }
 
 Eigen::SparseMatrix<double> MNQ::CreateSparseNMatrix(const Eigen::VectorXd &Y) {
-  Eigen::SparseMatrix<double> temp(500, 500);
+  Eigen::SparseMatrix<double> temp(TnoV, TnoV);
   std::vector<Eigen::Triplet<double>> triplets;
 
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < Nodes; i++) {
     int idx0 = i * 10 + 0;
     int idx1 = i * 10 + 1;
     int idx2 = i * 10 + 2;
@@ -143,9 +148,9 @@ Eigen::SparseMatrix<double> MNQ::Nold() { return CreateSparseNMatrix(Yold); }
 Eigen::SparseMatrix<double> MNQ::Nnew() { return CreateSparseNMatrix(Ynew); }
 
 Eigen::VectorXd MNQ::CreateQVector(const Eigen::VectorXd &Y) {
-  Eigen::VectorXd temp(500);
+  Eigen::VectorXd temp(TnoV);
 
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < Nodes; i++) {
     int idx0 = i * 10 + 0;
     int idx1 = i * 10 + 1;
     int idx2 = i * 10 + 2;

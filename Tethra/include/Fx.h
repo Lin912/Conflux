@@ -6,6 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include "Nums.h"
 
 class Fx {
 private:
@@ -21,6 +22,8 @@ private:
   double Gbx, Gby, Gbz;
   double Ax, Ay, Az;
 
+  // int Timestep, Nodes, Variables, TnoV;
+  
   int k;
 
 public:

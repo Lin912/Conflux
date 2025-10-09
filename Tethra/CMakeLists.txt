@@ -17,6 +17,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 设置优化等级为ofast
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 
+# 查找OpenMP包          ForLinux:  sudo apt-get install libomp-dev
+find_package(OpenMP REQUIRED)
+
 # 添加头文件路径
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -43,8 +46,9 @@ set(SOURCE_FILES
 add_executable(Tethra5 ${SOURCE_FILES})
 
 target_compile_definitions(Tethra5 PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+# 添加OpenMP支持
 # 链接Eigen库
-target_link_libraries(Tethra5 Eigen3::Eigen spdlog::spdlog_header_only)
+target_link_libraries(Tethra5 PRIVATE OpenMP::OpenMP_CXX Eigen3::Eigen spdlog::spdlog_header_only)
 
 # 设置构建类型为 Debug
 #set(CMAKE_BUILD_TYPE Debug)
