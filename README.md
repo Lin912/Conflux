@@ -1,10 +1,9 @@
 # Conflux
-A Code for the simulation of dynamic characterics of underwater tethered Rigid strcture.
+A complex-Code for simulate the dynamic characterics of tethered Rigid.
 
 Auther's Information:
 github Personal homepage: https://github.com/Lin912
-
-ORCid (0000-0003-3820-3199)
+ORCid (0009-0008-3501-429X)
 
 ## PART 1 <Tethra(Release Version 5.2)>
 For linux Server we release the Tethra5.2. 
