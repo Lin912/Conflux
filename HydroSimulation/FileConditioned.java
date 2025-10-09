@@ -108,7 +108,7 @@ public class FileConditioned extends StarMacro {
                         ReportMonitor reportMonitor_9 = ((ReportMonitor) simulation.getMonitorManager().getMonitor("rz"));//Monitor's Name
                         simulation.getMonitorManager().export(FILE_PATH_EULERANGLE, ",", new NeoObjectVector(new Object[] {reportMonitor_7, reportMonitor_8, reportMonitor_9}));//Output fileName
 
-
+                        simulation.saveState("star.sim");
                         simulation.println("Step Completed");
 
                         buffer.putInt(OFFSET_PROGRAM_CITRINE, 1);
