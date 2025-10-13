@@ -2,7 +2,7 @@
 An openchannel Code for simulate the dynamic characteric of tethered Rigids.
 
 ## PART 1 <Tethra(Nowdays Released Version->5.2)>
-For Linux Server paltfoam we release the Tethra5.2 which used for simulate the dynamic behaivor of Cable & Underwater chians & Marine risers.
+For Linux Server paltfoam we release the ***Tethra 5.2*** which used for simulate the dynamic behaivor of **Cable** & **Underwater chians** & **Marine risers**.
 
 The Porocess Folder include the Jacabian Matrix proceducer, Newton itterator, Data processor and, a Plotting part. 
 
@@ -33,7 +33,7 @@ Specify the CMake source path and the CMake executable path.
 ### 1.3 Cases of solution
 
 
-## PART 2 <HydroSimulation(Base on the commerical code->Star-CCM+)>
+## PART 2 <HydroSimulation>
 
 ### 2.1 Macro for Case
 
@@ -51,16 +51,26 @@ Download the StarCCM+, a commerical CFD code, and buy the Server License.
 
 ### 3.1 Memory mapped file(MMF)
 
-What is that? ->The Memory-Mapped File (MMF) is an OS mechanism that maps a file directly into a process's virtual address space. This allows an application to access file data as if it were resident in memory, using direct pointer operations rather than traditional read/write calls.
+**What is that?**
 
-How does it works? ->The operating system establishes a correlation between the file on disk and a range of virtual memory addresses. When the program accesses a memory address within this range, the OS transparently loads the corresponding file data from disk into physical RAM (via a page fault). This provides a seamless, on-demand loading mechanism.
+**->** The Memory-Mapped File (MMF) is an OS mechanism that maps a file directly into a process's virtual address space. This allows an application to access file data as if it were resident in memory, using direct pointer operations rather than traditional read/write calls.
 
-Why we choose that? ->High-Performance File I/O, Inter-Process Communication(IPC) ,and Handling Large Files Efficiently.
+**How does it works?** 
+
+**->** The operating system establishes a correlation between the file on disk and a range of virtual memory addresses. When the program accesses a memory address within this range, the OS transparently loads the corresponding file data from disk into physical RAM (via a page fault). This provides a seamless, on-demand loading mechanism.
+
+**Why we choose that?** 
+
+**->** High-Performance File I/O, Inter-Process Communication(IPC) ,and Handling Large Files Efficiently.
 
 ### 3.2 Active Polling process
-What is that? ->Active Polling is a synchronous programming pattern where a client process repeatedly and proactively checks the status of a server, device, or resource to see if it has new data, is ready for a transaction, or has changed state. It is a "pull" model. The client does not wait for a notification; instead, it takes the initiative to ask, "Are you ready yet? :)" at regular intervals. The key characteristic is that the client is always in control and expends its own computational effort to perform these checks, regardless of whether there is new information or not.
+**What is that?** 
 
-Why we choose that? ->Simplicity and Predictability: The logic is linear, making the code easy to write, understand, and debug. There is no complex setup for event handlers or callback functions. Avoids Complex Asynchronous Code: It avoids the potential complexity of asynchronous programming paradigms, which can sometimes lead to convoluted code known as "callback hell."
+**->** Active Polling is a synchronous programming pattern where a client process repeatedly and proactively checks the status of a server, device, or resource to see if it has new data, is ready for a transaction, or has changed state. It is a "pull" model. The client does not wait for a notification; instead, it takes the initiative to ask, "*Are you ready yet?* :)" at regular intervals. The key characteristic is that the client is always in control and expends its own computational effort to perform these checks, regardless of whether there is new information or not.
+
+**Why we choose that?** 
+
+**->** Simplicity and Predictability: The logic is linear, making the code easy to write, understand, and debug. There is no complex setup for event handlers or callback functions. Avoids Complex Asynchronous Code: It avoids the potential complexity of asynchronous programming paradigms, which can sometimes lead to convoluted code known as "*callback hell.*"
 
 ### 3.3 About Data info
 
@@ -80,6 +90,6 @@ Auther's Information:
 
 Email: T.Zhang@outlook.com
 
-github Personal homepage: https://github.com/Lin912
+github :[lin912] (https://github.com/Lin912)
 
 ORCid (0009-0008-3501-429X)
