@@ -81,57 +81,76 @@ vector<double> FiberRO::ReadWater(int k) {
 }
 
 vector<double> FiberRO::readLastLineData(const string& filePath) {
-    ifstream file(filePath, std::ios::binary | std::ios::ate);  
+    ifstream file(filePath, ios::binary | ios::ate);
     if (!file.is_open()) {
-        std::cerr << "Error: cannot open file " << filePath << std::endl;
+        cerr << "Error: cannot open file " << filePath << endl;
         return {};
     }
 
-    std::streampos fileSize = file.tellg();
+    streampos fileSize = file.tellg();
     if (fileSize <= 0) {
-        std::cerr << "Warning: file is empty: " << filePath << std::endl;
+        cerr << "Warning: file is empty: " << filePath << endl;
         return {};
     }
 
     size_t bufferSize = 1024;
-    std::string lastLine;
+    string lastLine;
 
     while (true) {
         if (bufferSize > static_cast<size_t>(fileSize))
             bufferSize = static_cast<size_t>(fileSize);
 
-        std::vector<char> buffer(bufferSize + 1, '\0');
-        file.seekg(-static_cast<std::streamoff>(bufferSize), std::ios::end);
+        vector<char> buffer(bufferSize + 1, '\0');
+        file.seekg(-static_cast<streamoff>(bufferSize), ios::end);
         file.read(buffer.data(), bufferSize);
 
-        char* lastNewline = std::strrchr(buffer.data(), '\n');
+        char* lastNewline = strrchr(buffer.data(), '\n');
 
         if (lastNewline) {
-            lastLine = lastNewline + 1;  
+            if (*(lastNewline + 1) == '\0') {
+                *lastNewline = '\0';
+                lastNewline = strrchr(buffer.data(), '\n');
+            }
+
+            if (lastNewline)
+                lastLine = string(lastNewline + 1);
+            else
+                lastLine = string(buffer.data());
             break;
         } else if (bufferSize >= static_cast<size_t>(fileSize)) {
-            lastLine = buffer.data();
+            lastLine = string(buffer.data());
             break;
         } else {
             bufferSize *= 2;
         }
     }
 
-    return ParseCSVLine(lastLine.c_str());
+    if (!lastLine.empty() && lastLine.back() == '\r')
+        lastLine.pop_back();
+
+    vector<double> result = ParseCSVLine(lastLine.c_str());
+
+    if (result.size() > 3) {
+        result.erase(result.begin(), result.end() - 3);
+    }
+
+    return result;
 }
 
 vector<double> FiberRO::ParseCSVLine(const char* lineStart) {
     vector<double> result;
     const char* ptr = lineStart;
-    const char* end = lineStart + std::strlen(lineStart);
-    result.reserve(16); 
+    const char* end = lineStart + strlen(lineStart);
+    result.reserve(16);
 
     while (ptr < end) {
-        const char* next = std::find(ptr, end, ',');
-        double value = 0.0;
-        auto [p, ec] = std::from_chars(ptr, next, value);
-        if (ec == std::errc())
-            result.push_back(value);
+        const char* next = find(ptr, end, ',');
+        string token(ptr, next);
+        try {
+            result.push_back(stod(token));
+        } catch (...) {
+            
+        }
         ptr = (next == end) ? end : next + 1;
     }
     return result;

@@ -36,7 +36,7 @@ class FiberRO {
         string fileObject;
         string fileDelta;
         string fileNums;
-        string outfile;
+        // string outfile;
         string Outfile;
         string Topforceout;
         string Bottomforceout;
