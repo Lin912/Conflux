@@ -1,5 +1,5 @@
 # The Conflux
-An openchannel Code for simulate the dynamic characteric of tethered Rigids.
+An open source code for simulate the dynamic characteric of tethered Rigids.
 
 ## PART 1 <Tethra(Nowdays Released Version->5.2)>
 For Linux Server paltfoam we release the ***Tethra 5.2*** which used for simulate the dynamic behaivor of **Cable** & **Underwater chians** & **Marine risers**.
