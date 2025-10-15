@@ -15,9 +15,9 @@ In the numerical simulation process, the velocity components at the upper end of
 
 The local coordinate systems for cable elements $(t,n,b)$ are orthogonal coordinates that are specific to each point of the cable elements. The local frame's orientation is selected such that $t$ represents the tangent to cable element in the direction of increasing unstretched cable element length, $n$ represents the normal direction, and $b$ completes a right-handed coordinate system. The fixed inertial coordinate system $(X,Y,Z)$ remains fixed in space, with $Y$ and $Z$ being in the horizontal plane and $X$ directed downwards. Assuming that the torsion effect of the cable is ignored, the relationship between the two frames $(X,Y,Z)$ and $(t,n,b)$ at any location of a cable element is:
 
-\begin{equation}
-		(t,n,b) = (X,Y,Z)[T]
-\end{equation}
+$$
+    (t,n,b) = (X,Y,Z)[T]
+$$
 
 where,
 
