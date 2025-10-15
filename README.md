@@ -21,14 +21,14 @@ $$
 
 where,
 
-\begin{equation}
+$$
 		[T] = 
 		\begin{bmatrix}
 			cos\phi cos\theta&	-sin\phi&	cos\phi sin\theta\\
 			cos\theta sin\phi&	cos\phi &	sin\phi sin\theta\\
 			-sin\theta&			0&			cos\theta\\
 		\end{bmatrix}
-\end{equation}
+$$
 
 with the symbol $\phi$ denotes the rotation Euler angle around $Z$-axis, while $\theta$ specifies the rotation Euler angle around $Y$-axis.
 
@@ -42,130 +42,130 @@ The cable in the system is considered to be a lengthy, slender, flexible circula
 
 Under these assumptions, the following relationships can be found:
 	
-\begin{equation}
+$$
 		{d_p} = (1+e) {d_s}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 		e = \frac{T}{EA}
 		\label{Eq4}
-\end{equation}
+$$
 
 where $d_s$ and $d_p$ represent the lengths of the cable element before and after being stretched, and $e$ denotes the magnitude of the axial strain. $T$ represents the tension which is a component of the internal force acting on the cable element. While, the symbol $A$ denotes the cross-section area of cable. $E$ is the Young's modulus of cable.
 	
 Considering a unit length of a stretched cable element located at the local coordinate systems$(t,n,b)$, the cable element conforms to the law of conservation of mass. The balance of forces at any location of cable element can be written as:
 
-\begin{equation}
+$$
 	m\frac{D\vec{V}}{Dt} = \frac{D\vec{N}}{Ds} + (1+e)\sum \vec{R}
 	\label{Eq5}
-\end{equation}
+$$
 
 or
 
-\begin{equation}
+$$
 	m\frac{D\vec{V}}{Dt} = \frac{D\vec{N}}{Ds} + (1+e)(\vec{R_g} + \vec{R_i} + \vec{R_r})
 	\label{Eq6}
-\end{equation}
+$$
 
 In Equation \eqref{Eq6}, $\vec{V}$ and $\vec{N}$ denote the velocity and internal force vectors of a cable element. The velocity vector can be expressed in component form as $\vec{V}=(u,v,w)$. The internal force vector $\vec{N}$ can be expressed as $\vec{N}=(T,S_n,S_b)$. The symbols $\vec{R_g}$, $\vec{R_i}$, and $\vec{R_r}$ on the right side of the equation denote the submerged weight, the inertial force, and the damping forces on the cable element respectively. The combined force $\sum \vec{R}$ represents the external effect that indicates the influence of fluid and gravity on the cable element. Therefore, the external forces can be expressed as follows:
 	
-\begin{equation}
+$$
 	(1+e)\vec{R_g} = (-w) sin\phi cos\theta \vec{t} + (-w)cos\phi \vec{n} + (-w)sin\phi sin\theta \vec{b}
 	\label{Eq7}
-\end{equation} 
+$$ 
 	
-\begin{equation}
+$$
 	(1+e)\vec{R_i} = -m_a \frac{\partial v}{\partial t} \vec{n} - m_a \frac{\partial w}{\partial t} \vec{b}
 	\label{Eq8}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	(1+e)\vec{R_r} = R_r{}_t \vec{t} + R_r{}_n \vec{n} + R_r{}_b \vec{b}
 	\label{Eq9}
-\end{equation}
+$$
 
 where, $m_a$ represents the additional mass, and $w$ the submerged weight. The damping force is determined by the Morison equation:
 
-\begin{equation}
+$$
 	R_r{}_t = -\frac{1}{2} \pi \rho d C_d{}_t u |u| \sqrt{1+e}
 	\label{Eq10}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	R_r{}_n = -\frac{1}{2} \rho d C_d{}_n v \sqrt{v^2 + w^2} \sqrt{1+e}
 	\label{Eq11}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	R_r{}_b = -\frac{1}{2} \rho d C_d{}_b w \sqrt{v^2 + w^2} \sqrt{1+e}
 	\label{Eq12}
-\end{equation}
+$$
 
 In Equations \eqref{Eq10} to \eqref{Eq12}, $\rho$ represents the density of water, $d$ refers to the diameter of the cable element’s cross-sectional area. $C_{dt}$, $C_{dn}$, and $C_{db}$ are the Morison coefficient indicates the force of fluid acting on the cable element.$C_{dt}$ is the inertia coefficient while $C_{dn}$, and $C_{db}$ are the drag coefficient. 
 	
 Equation \eqref{Eq5} can be written as a system of three scalar equations by taking components in three independent directions. Components in directions $(t,n,b)$ give:
 	
-\begin{equation}
+$$
 	m \frac{\partial u}{\partial t} + m(\omega_2 w - \omega_3 v) - \frac{\partial T}{\partial s} - (S_b \Omega_2 - S_n \Omega_3) - (w_{}sin\phi cos\theta +\frac{1}{2} \pi \rho d_0 C_d{}_t u |u| \sqrt{1+e}) = 0
 	\label{Eq13}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	m \frac{\partial v}{\partial t} + m(\omega_3 u - \omega_1 w) - \frac{\partial S_n}{\partial s} - (T \Omega_3 - S_b \Omega_1) - (w_{}cos \phi +m_a \frac{\partial v}{\partial t} +\frac{1}{2} \rho d_0 C_d{}_n v \sqrt{v^2 +w^2} \sqrt{1+e}) = 0
 	\label{Eq14}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	m \frac{\partial w}{\partial t} + m(\omega_1 v - \omega_2 u) - \frac{\partial S_b}{\partial s} - (S_n \Omega_1 - T \Omega_2) - (w_{}sin \phi sin \theta +m_a \frac{\partial w}{\partial t} +\frac{1}{2} \rho d_0 C_d{}_b w \sqrt{v^2 + w^2} \sqrt{1+e}) = 0
 	\label{Eq15}
-\end{equation}
+$$
 
 where the variables $\omega_1$, $\omega_2$, and $\omega_3$ represent the components of angular velocity around the $t$, $n$, and $b$ axes, respectively. The components $\Omega_1$, $\Omega_2$, and $\Omega_3$ represent the Darboux vector $\vec{\Omega}$, which describes the space curvature of the cable element along the $(t,n,b)$ axis.
 	
 The conservation of momentum equation is adopted to describe the effects of bending moment on the cable element. The bending effect can prevent the divergence of the solution process because the Euler angle matrix becomes singular when the bending moment effects are neglected. The conservation of momentum equation referenced the solution process of the internal flow effect on vibrating catenary risers, as discussed by \cite{RN1658}:
 	
-\begin{equation}
+$$
 	\frac{1}{1+e}\frac{D[\rho_c I \vec{\omega}]}{Dt} = \frac{1}{(1+e)^2}(\frac{\partial \vec{M}}{\partial s}+\vec{\Omega} \times \vec{M})+\vec{t} \times (1+e)\vec{N}
 	\label{Eq16}
-\end{equation}
+$$
 
 where $\vec{M}$ is the sum of the bending moment components in $\vec{n}$ and $\vec{b}$ direction, with the relation $\vec{M} = M_n \vec{n} + M_b \vec{b}$. And the detailed description of the two components are $M_n = E I \Omega_2$ and $M_b = E I \Omega_3$.
 	
 Expanding the Equation \eqref{Eq16} in two directions, with neglecting the torsion effect, the equations can be written as:
 	
-\begin{equation}
+$$
 	(1+e)\rho_c I \frac{\partial \omega_2}{\partial t} - E I \frac{\partial \Omega_2}{\partial s} +  E I \Omega_1 \Omega_3 + S_b (1+e)^3 = 0
 	\label{Eq17}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	(1+e)\rho_c I \frac{\partial \omega_3}{\partial t} - E I \frac{\partial \Omega_3}{\partial s} + E I \Omega_1 \Omega_2 + S_n (1+e)^3 = 0
 	\label{Eq18}
-\end{equation}
+$$
 	
 To ensure the continuity of the selected cable element with the adjacent elements, it is necessary to give the compatibility relation equations for the element. The position vector $\vec{S}(s,t)$ should satisfy smoothness conditions in both the $t$ and $s$ spaces. Then, the equations for the compatibility relation are derived: 
 	
-\begin{equation}
+$$
 	\frac{D}{D t}[(1+e)\vec{S}] = \frac{D \vec{V}}{D s}
 	\label{Eq19}
-\end{equation}
+$$
 
 with $e$ can be expressed as $T/EA$ aforementioned, the Equation(19) can be expanded as:
 
-\begin{equation}
+$$
 	\frac{1}{EA} \frac{\partial T}{\partial t} - \frac{\partial u}{\partial s} - (\Omega_2 w - \Omega_3 v) = 0
 	\label{Eq20}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	(1+e)\omega_3 - \frac{\partial v}{\partial s} - (\Omega_3 u - \Omega_1 w) = 0
 	\label{Eq21}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	(1+e)\omega_2 + \frac{\partial w}{\partial s} + (\Omega_1 v - \Omega_2 u) = 0
 	\label{Eq22}
-\end{equation}
+$$
 	
 There are $11$ unknown variables in Equations \eqref{Eq13} to \eqref{Eq15}, \eqref{Eq17} to \eqref{Eq18}, and \eqref{Eq20} to \eqref{Eq22}, that is,
 
@@ -178,34 +178,34 @@ There are $11$ unknown variables in Equations \eqref{Eq13} to \eqref{Eq15}, \eqr
 	
 In order to obtain a solvable system, three more equations are required.  These equations are provided by the Euler angular velocity derivation procedure: 
 	 
-\begin{equation}
+$$
 	\Omega_1 = -\sin\theta \frac{d\phi}{ds}
 	\label{Eq23}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	\Omega_2 = \frac{d\theta}{ds}
 	\label{Eq24}
-\end{equation}
+$$
 	
-\begin{equation}
+$$
 	\Omega_3 = \cos\theta \frac{d\phi}{ds}
 	\label{Eq25}
-\end{equation}
+$$
 
 In the Equation \eqref{Eq23} and \eqref{Eq25}, the right-hand component have a relation of multiples. It can be seen that the relation between  $\Omega_1$ and $\Omega_3$ is
 	
-\begin{equation}
+$$
 	\Omega_1 = -tan \theta \Omega_3
 	\label{Eq26}
-\end{equation}
+$$
 	
 To simplify the calculation process, the unknown variable $\Omega_1$ is represented by the product of variables $\Omega_3$ and $tan \theta$. Then, the quantity of unknown variables is reduced to $10$. Equations \eqref{Eq24} and \eqref{Eq25} and Equations \eqref{Eq13} to \eqref{Eq15}, \eqref{Eq17} to \eqref{Eq18}, and \eqref{Eq20} to \eqref{Eq22} form a complete set of equations of motion for the cable element. The ten equations can be written in a matrix form as:
 	
-\begin{equation}
+$$
 	M \frac{\partial \vec{Y}}{\partial t} + N \frac{\partial \vec{Y}}{\partial s} + Q = 0
 	\label{Eq27}
-\end{equation}
+$$
 
 where $\vec{Y} = [u, v, w, T, S_n, S_b, \theta, \phi, \Omega_n, \Omega_b]^T$ is variables vector.
 	
