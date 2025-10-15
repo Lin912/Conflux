@@ -209,8 +209,43 @@ $$
 
 where $\vec{Y} = [u, v, w, T, S_n, S_b, \theta, \phi, \Omega_n, \Omega_b]^T$ is variables vector.
 	
+### 1.4 Boundary condition of the cable
+In our research, it is assumed that knuckle joints are adopted at the upper and lower end of the cable, and the velocity components at the upper end of the cable must be identical with the working ship on water surface. Therefore the velocity components $u_U$, $v_U$ and $w_U$ at the upper end of the cable in the local coordinate of the cable are determined by:
+$$	[u_U, v_U, w_U] = [u_u, v_u, w_u][T]
+	\label{Eq28}
+$$
 
+where $u_u$, $v_u$ and $w_u$ are the velocity components of the working ship on water surface in inertial coordinates.
+	
+The Darboux vector $\vec{\Omega}$ at the upper and lower ends of the cable should be satisfied:
 
+$$	
+    \vec{\Omega_U} = 0 
+    \label{Eq29} 
+$$
+	
+$$
+	\vec{\Omega_L} = 0
+	\label{Eq30}
+$$
+
+where $\vec{\Omega} = [\Omega_2, \Omega_3]$, $\Omega_2$ and $\Omega_3$ are the normal and binormal components of the Darboux vector, respectively, and the subscripts $U$, or $L$ denote the upper or lower end of the cable.
+	
+When the cable governing equation \eqref{Eq27} is solved numerically at every time step with finite difference methods, the velocity components $u_L$, $v_L$ and $w_L$ of the cable at the lower end in the cable local coordinate are given directly:
+
+$$
+	[u_L, v_L, w_L]^T = [u_{L0}, v_{L0}, w_{L0}]^T
+	\label{Eq31}
+$$
+
+the values of $u_{L0}$, $v_{L0}$ and $w_{L0}$ in Equation \eqref{Eq31} are determined by the conversion relationship between the lower end of the cable and the linking point of the tethered vehicle:
+
+$$
+	[V_R + \omega \times r_T] = [E] [T] V_L
+	\label{Eq32}
+$$
+
+where $V_R = (u_r,v_r,w_r)^T$ and $\omega = (p_r, q_r, r_r)$ are translational and angular velocities of the tethered vehicle in the body-fixed coordinates, $r_T = (x_T, y_T, z_T)$ is the linking point coordinates in the body-fixed frame, $V_L = (u_{L0},v_{L0},w_{L0})^T$ is the velocity of the linking point between the tethered vehicle and the cable expressed in local coordinates of the cable, and $[E]$ is the transform matrix between the local frame of the tethered vehicle and the inertial frame will shown in section \ref{2.3}.
 
 
 
