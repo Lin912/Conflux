@@ -8,6 +8,42 @@ The Porocess Folder include the Jacabian Matrix proceducer, Newton itterator, Da
 
 ### 1.1 Theory
 
+#### Coordinate system definition and model construction
+Three different coordinate systems are used in the derivation to the mathematical model of the underwater tethered system, i.e. the fixed inertial coordinate system $(X,Y,Z)$, the local coordinate systems for cable elements $(t,n,b)$ and the local system for tethered vehicle $(X_{r},Y_{r},Z_{r})$
+
+a module dealing with numerical solution of established mathematical model for cable and a CFD module dealing with determination of the hydrodynamic characteristics of tethered vehicle are first constructed, the two modules are then interfaced dynamically at the conjunction point between the lower end of the cable and the towed point of tethered vehicle. By this way, the numerical model of the underwater tethered system is constructed. 
+	
+In the numerical simulation process, the velocity components at the upper end of the cable, which is connected with a working ship on water surface, serve as an active motivation to control the underwater tethered system.
+
+#### Coordinate transformation
+
+The local coordinate systems for cable elements $(t,n,b)$ are orthogonal coordinates that are specific to each point of the cable elements. The local frame's orientation is selected such that $t$ represents the tangent to cable element in the direction of increasing unstretched cable element length, $n$ represents the normal direction, and $b$ completes a right-handed coordinate system. The fixed inertial coordinate system $(X,Y,Z)$ remains fixed in space, with $Y$ and $Z$ being in the horizontal plane and $X$ directed downwards. Assuming that the torsion effect of the cable is ignored, the relationship between the two frames $(X,Y,Z)$ and $(t,n,b)$ at any location of a cable element is:
+
+\begin{equation}
+		(t,n,b) = (X,Y,Z)[T]
+		\label{Eq1}
+	\end{equation}
+	where
+	\begin{equation}
+		[T] = 
+		\begin{bmatrix}
+			cos\phi cos\theta&	-sin\phi&	cos\phi sin\theta\\
+			cos\theta sin\phi&	cos\phi &	sin\phi sin\theta\\
+			-sin\theta&			0&			cos\theta\\
+		\end{bmatrix}
+	\label{Eq2}
+\end{equation}
+
+with the symbol $\phi$ denotes the rotation Euler angle around $Z$-axis, while $\theta$ specifies the rotation Euler angle around $Y$-axis.
+
+
+
+
+
+
+
+
+
 
 
 
