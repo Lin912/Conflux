@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include "Fx.h"
 #include "Jacobian.h"
 
@@ -20,7 +21,8 @@ public:
     ~Load();
 
     VectorXd LF(int k);
-    MatrixXd LJ(int k);
+    // MatrixXd LJ(int k); //Dense Jacobian Matrix
+    SparseMatrix<double> LJ(int k);
   
     
 };

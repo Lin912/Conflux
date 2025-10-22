@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <spdlog/spdlog.h>
-
+#include <Eigen/Sparse>
 
 Load::Load(const VectorXd &arr, const VectorXd &brr) : Yold(arr), Ynew(brr) {}
 
@@ -16,7 +16,7 @@ VectorXd Load::LF(int k) {
   return A.fx();
 }
 
-MatrixXd Load::LJ(int k) {
+SparseMatrix<double> Load::LJ(int k) {
   SPDLOG_DEBUG("Calculating LJ for index {}", k);
   Jacobian A(Yold, Ynew, k);
   return A.jacobian();
