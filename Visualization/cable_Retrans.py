@@ -16,15 +16,15 @@ def process_data(data, transform_cols):
 
 # main
 if __name__ == "__main__":
-    data = pd.read_csv('output/output.csv', header=None).fillna(0).values
+    data = pd.read_csv('output/Data/output.csv', header=None).fillna(0).values
     
     if data.shape[1] % 10 != 0:
         raise ValueError("数据列数必须是10的倍数。")
 
     #(Retans.m)
     data1 = process_data(data.copy(), transform_cols=(0, 3))
-    np.savetxt('output/newoutput1.csv', data1, delimiter=',')
+    np.savetxt('output/Data/newoutput1.csv', data1, delimiter=',')
 
     #(Retans2.m)
     data2 = process_data(data.copy(), transform_cols=(3, 6))
-    np.savetxt('output/newoutput2.csv', data2, delimiter=',')
+    np.savetxt('output/Data/newoutput2.csv', data2, delimiter=',')

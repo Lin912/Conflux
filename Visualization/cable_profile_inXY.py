@@ -3,12 +3,16 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 # 设置使用可用字体替代Times New Roman
-plt.rcParams['font.family'] = ['DejaVu Serif', 'Liberation Serif', 'serif']
-plt.rcParams['font.serif'] = ['DejaVu Serif', 'Liberation Serif', 'serif']
+plt.rcParams['font.family'] = ['DejaVu Serif']
+plt.rcParams['font.serif'] = ['DejaVu Serif']
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 
 # 数据导入
-data = np.loadtxt('output/newoutput1.csv', delimiter=',')
+print("Loading Data...")
+data = np.loadtxt('output/Data/newoutput1.csv', delimiter=',')
 rows, cols = data.shape
+print(f"Loaded the Data, which is: {data.shape}")
 
 # 处理数据的矩阵重组
 if cols % 10 == 0:
@@ -82,18 +86,18 @@ print("Integral Over!")
 t = np.arange(0.001, 20.001, 0.001)  # TimeStep
 
 # 提取数据绘图
-X1, X50 = data_new[:, 0], data_new[:, 297]
-Y1, Y50 = data_new[:, 1], data_new[:, 298]
-Z1, Z50 = data_new[:, 2], data_new[:, 299]
+X1, X100 = data_new[:, 0], data_new[:, 297]
+Y1, Y100 = data_new[:, 1], data_new[:, 298]
+Z1, Z100 = data_new[:, 2], data_new[:, 299]
 
 # 统一绘图参数
 def plot_displacement(t, data, title, subplot_pos):
     plt.subplot(2, 3, subplot_pos)
     plt.plot(t, data, '-', linewidth=1.2)
-    plt.xlim([0, 10])
-    plt.ylim([-0.5, 0.5])
-    plt.xticks(np.arange(0, 11, 2))
-    plt.yticks(np.arange(-0.5, 0.6, 0.2))
+    plt.xlim([0, 4])
+    plt.ylim([-0.2, 0.2])
+    plt.xticks(np.arange(0, 4.5, 0.5))
+    plt.yticks(np.arange(-0.2, 0.25, 0.05))
     plt.title(title, fontsize=12)
     plt.xlabel("Time(s)")
     plt.ylabel("Displacement(m)")
@@ -102,15 +106,17 @@ def plot_displacement(t, data, title, subplot_pos):
 # 绘图
 plt.figure(figsize=(15, 8))
 
-plot_displacement(t, Y1, "Displacement at Point1 in Y-direction", 2)
-plot_displacement(t, Y50, "Displacement at Point50 in Y-direction", 5)
-plot_displacement(t, X1, "Displacement at Point1 in X-direction", 1)
-plot_displacement(t, X50, "Displacement at Point50 in X-direction", 4)
-plot_displacement(t, Z1, "Displacement at Point1 in Z-direction", 3)
-plot_displacement(t, Z50, "Displacement at Point50 in Z-direction", 6)
+plot_displacement(t, Y1,    "Point01's  Displacement at in Y-direction", 2)
+plot_displacement(t, Y100,  "Point100's Displacement at in Y-direction", 5)
+plot_displacement(t, X1,    "Point01's  Displacement at in X-direction", 1)
+plot_displacement(t, X100,  "Point100's Displacement at in X-direction", 4)
+plot_displacement(t, Z1,    "Point01's  Displacement at in Z-direction", 3)
+plot_displacement(t, Z100,  "Point100's Displacement at in Z-direction", 6)
 
 plt.tight_layout()
-plt.savefig('output/Figures/displacement_plot.png', dpi=600, bbox_inches='tight')
-plt.show()
 
-print("Plot done! the Figures are saved as displacement_plot.png")
+output_filename = "Profile_in_XYZ"
+plt.savefig(f'output/Figures/{output_filename}.png', dpi=600, bbox_inches='tight', facecolor='white')
+# plt.show()
+
+print(f"Plot done! the Figures are saved as {output_filename}.png")

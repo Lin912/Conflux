@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../csv/TopVel4_A0.1T4.0_Z0.45_20s/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+    : fileTopVel("../csv/TopVel4_A0.3_T2.0_Z0.40_20s/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
       fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
       fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
       fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),
@@ -136,6 +136,7 @@ vector<double> FiberRO::readLastLineData(const string& filePath) {
 
     return result;
 }
+
 
 vector<double> FiberRO::ParseCSVLine(const char* lineStart) {
     vector<double> result;
@@ -448,7 +449,8 @@ void FiberRO::OutTopforce(VectorXd v) {
   //////////////////////////////////////////////////////////////////
   
   MatrixXd bb(1, 3);
-  bb = aa * tpmat.inverse();
+//   bb = aa * tpmat.inverse();
+  bb = aa * tpmat;
   outfileTopforce << bb;
   outfileTopforce.close();
 }
@@ -475,7 +477,8 @@ void FiberRO::OutBottomforce(VectorXd v) {
   ///////////////////////////////////////////////////////////////////
 
   MatrixXd bb(1, 3);
-  bb = aa * tpmat.inverse();
+//   bb = aa * tpmat.transpose();
+  bb = aa * tpmat;
   outfileBottomforce << bb;
   outfileBottomforce.close();
 }
@@ -516,7 +519,7 @@ vector<double> FiberRO::ReadBottomVel() {
   return arrdata;
 }
 
-Matrix3x3 FiberRO::computeRotationMatrix(const vector<double> &Eulerangle) {
+Matrix3x3 FiberRO::computeRotationMatrix(const vector<double> &Eulerangle) { // The Rotation Order is XYZ
   Matrix3x3 Rz = {{{cos(Eulerangle[2]), -sin(Eulerangle[2]), 0},
                    {sin(Eulerangle[2]), cos(Eulerangle[2]), 0},
                    {0, 0, 1}}};

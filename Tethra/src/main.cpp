@@ -27,7 +27,7 @@ std::mutex mtx;
 std::condition_variable cv;
 
 int main(){
-  int timeForCitrine = 1166;
+  int timeForCitrine = 0;
 
   Eigen::initParallel();
   Eigen::setNbThreads(THREADS);

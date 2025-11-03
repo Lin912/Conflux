@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
 # 设置可用字体
-plt.rcParams['font.family'] = ['DejaVu Serif', 'Liberation Serif', 'serif']
+plt.rcParams['font.family'] = ['DejaVu Serif']
 
 # 数据导入
 print("Loading Data...")
-data = np.loadtxt('output/newoutput1.csv', delimiter=',')
+data = np.loadtxt('output/Data/newoutput1.csv', delimiter=',')
 rows, cols = data.shape
 print(f"Data Shape: {data.shape}")
 
@@ -64,14 +64,14 @@ print("Intergate done!!")
 
 # 修改 data_new 的第二列值 - 修复索引问题
 n_points = data_new.shape[1] // 3  # 实际点数
-K = np.arange(0, -50 * n_points, -50)[:n_points]  # 根据实际点数生成K
+K = np.arange(0, -0.2 * n_points, -0.2)[:n_points]  # 根据实际点数生成K，纵向节点间距为0.2m
 
 for j in range(n_points):
     if 3 * j + 2 < data_new.shape[1]:
-        data_new[:, 3 * j + 2] += K[j]
+        data_new[:, 3 * j + 0] += K[j]
 
 # 定义点的集合 - 修复索引边界问题
-time_indices = np.arange(0, min(2001, data_new.shape[0]), 100)  # 确保不超出时间范围
+time_indices = np.arange(0, min(20000, data_new.shape[0]), 100)  ##################################### 确保不超出时间范围(时间范围值)
 point_indices = np.arange(n_points)  # 使用实际点数
 
 # 预分配数组
@@ -86,9 +86,9 @@ for time_idx in time_indices:
         x_vals, y_vals, z_vals = [], [], []
         
         for j in point_indices:
-            x_idx = 3 * j + 2
-            y_idx = 3 * j + 3
-            z_idx = 3 * j + 1
+            x_idx = 3 * j + 0
+            y_idx = 3 * j + 1
+            z_idx = 3 * j + 2
             
             # 检查所有索引是否有效
             if (x_idx < data_new.shape[1] and 
@@ -106,15 +106,31 @@ for time_idx in time_indices:
 
 print(f"Successfully processed {len(Xr)} valid time series")
 
+
+# def rot_y_neg90(x, y, z):
+    # 绕 y 轴旋转 -90°：X'=-Z, Y'=Y, Z'=X
+#   return -z, y, x
+
+# 批量旋转所有时间曲线
+# Xr2, Yr2, Zr2 = [], [], []
+# for x, y, z in zip(Xr, Yr, Zr):
+#     xr, yr, zr = rot_y_neg90(x, y, z)
+#     Xr2.append(xr); Yr2.append(yr); Zr2.append(zr)
+
+
 # 定义中心点数据 - 修复索引
-valid_center_points = min(2000, data_new.shape[0])
+valid_center_points = min(20000, data_new.shape[0]) #####################################################(红线的时间范围值)
 if data_new.shape[1] >= 4:  # 确保有足够的列
-    Xc = data_new[:valid_center_points, 2]
-    Yc = data_new[:valid_center_points, 3] 
-    Zc = data_new[:valid_center_points, 1]
+    Xc = data_new[:valid_center_points, 0]
+    Yc = data_new[:valid_center_points, 1] 
+    Zc = data_new[:valid_center_points, 2]
 else:
     Xc, Yc, Zc = np.array([]), np.array([]), np.array([])
     print("Warning: Not enough columns for center point data")
+
+# 旋转中心轨迹
+# Xc2, Yc2, Zc2 = rot_y_neg90(Xc, Yc, Zc)
+
 
 # 绘制3D图
 if len(Xr) > 0:
@@ -137,76 +153,25 @@ if len(Xr) > 0:
     if len(Xc) > 1:
         ax.plot(Xc, Yc, Zc, linestyle="--", color="#B3112F", linewidth=2.5, label='Center Point Trajectory')
 
-    # 图形设置 - 根据数据动态调整范围和刻度
-    if len(Xr) > 0:
-        all_x = np.concatenate(Xr)
-        all_y = np.concatenate(Yr) 
-        all_z = np.concatenate(Zr)
+        ax.set_xlim(-25.0, 5.0)     # X 轴范围
+        ax.set_ylim(-0.50, 0.50)   # Y 轴范围
+        ax.set_zlim(-0.20, 1.0)     # Z 轴范围
         
-        print(f"Data ranges - X: [{np.min(all_x):.2f}, {np.max(all_x):.2f}], "
-              f"Y: [{np.min(all_y):.3f}, {np.max(all_y):.3f}], "
-              f"Z: [{np.min(all_z):.3f}, {np.max(all_z):.3f}]")
+        ax.set_xticks(np.arange(-25.0, 7.00, 2.00))
+        ax.set_yticks(np.arange(-0.50, 0.60,  0.10))
+        ax.set_zticks(np.arange(-0.20, 1.20,  0.20))
+       
+        # 如需自定义刻度标签格式，手动给字符串
+        ax.set_xticklabels([f"{v:.1f}" for v in ax.get_xticks()])
+        ax.set_yticklabels([f"{v:.2f}" for v in ax.get_yticks()])
+        ax.set_zticklabels([f"{v:.2f}" for v in ax.get_zticks()])
         
-        # 设置坐标轴范围（增加15%的边距）
-        x_range = np.max(all_x) - np.min(all_x)
-        y_range = np.max(all_y) - np.min(all_y)
-        z_range = np.max(all_z) - np.min(all_z)
         
-        x_margin = x_range * 0.15
-        y_margin = y_range * 0.15
-        z_margin = z_range * 0.15
-        
-        ax.set_xlim([np.min(all_x) - x_margin, np.max(all_x) + x_margin])
-        ax.set_ylim([np.min(all_y) - y_margin, np.max(all_y) + y_margin])
-        ax.set_zlim([np.min(all_z) - z_margin, np.max(all_z) + z_margin])
-        
-        # 改进的智能刻度函数
-        def smart_ticks(data_min, data_max, max_ticks=6):
-            """改进的智能刻度生成函数"""
-            data_range = data_max - data_min
-            if data_range == 0:
-                return np.array([data_min])
-            
-            # 计算理想的刻度间隔
-            ideal_step = data_range / (max_ticks - 1)
-            
-            # 找到最接近的理想步长的10的幂次
-            exponent = np.floor(np.log10(ideal_step))
-            fraction = ideal_step / (10 ** exponent)
-            
-            # 选择最接近的标准步长
-            if fraction < 1.5:
-                step = 10 ** exponent
-            elif fraction < 3:
-                step = 2 * 10 ** exponent
-            elif fraction < 7:
-                step = 5 * 10 ** exponent
-            else:
-                step = 10 * 10 ** exponent
-            
-            # 确保至少有3个刻度
-            num_ticks = int(data_range / step) + 1
-            if num_ticks < 3:
-                step = data_range / 2
-            
-            # 生成刻度
-            start = np.floor(data_min / step) * step
-            end = np.ceil(data_max / step) * step
-            ticks = np.arange(start, end + step/2, step)
-            
-            # 确保刻度在数据范围内
-            ticks = ticks[(ticks >= data_min - step/2) & (ticks <= data_max + step/2)]
-            
-            return ticks
-        
-        # 设置各轴刻度
-        x_ticks = smart_ticks(np.min(all_x), np.max(all_x))
-        y_ticks = smart_ticks(np.min(all_y), np.max(all_y))
-        z_ticks = smart_ticks(np.min(all_z), np.max(all_z))
-        
-        ax.set_xticks(x_ticks)
-        ax.set_yticks(y_ticks)
-        ax.set_zticks(z_ticks)
+        #spacing = 0.2
+        #L = (n_points - 1) * spacing
+        #ax.set_xlim(-L - 0.2, 0.2)   # 例：给定固定边界
+        #ax.set_xticks(np.arange(-L, 0.001, spacing))  # 每 0.2m 一个刻度
+       
         
         # 改进的刻度标签格式化
         def format_tick_labels(ticks):
@@ -229,14 +194,10 @@ if len(Xr) > 0:
             else:
                 return [f'{tick:.0f}' for tick in ticks]
         
-        ax.set_xticklabels(format_tick_labels(x_ticks))
-        ax.set_yticklabels(format_tick_labels(y_ticks))
-        ax.set_zticklabels(format_tick_labels(z_ticks))
-
     # 设置坐标轴标签
-    ax.set_xlabel('Z Coordinate (m)', fontsize=14, fontweight='bold', labelpad=15)
+    ax.set_xlabel('X Coordinate (m)', fontsize=14, fontweight='bold', labelpad=15)
     ax.set_ylabel('Y Coordinate (m)', fontsize=14, fontweight='bold', labelpad=15)
-    ax.set_zlabel('X Coordinate (m)', fontsize=14, fontweight='bold', labelpad=15)
+    ax.set_zlabel('Z Coordinate (m)', fontsize=14, fontweight='bold', labelpad=15)
 
     # 修改刻度样式
     ax.tick_params(axis='x', which='major', labelsize=12, pad=8)
@@ -251,6 +212,12 @@ if len(Xr) > 0:
     
     # 设置视角
     ax.view_init(elev=30, azim=45)
+    #ax.view_init(elev=22, azim=128)   # 俯仰≈22°，方位≈128°
+    ax.set_box_aspect((1, 1, 0.35))
+    # 如果仍感觉左右相反，可再反转 Z 轴方向（视具体数据决定是否需要）：
+    # ax.invert_xaxis()
+    # ax.invert_yaxis()
+    # ax.invert_zaxis()
     
     # 添加颜色条
     sm = plt.cm.ScalarMappable(cmap='viridis', 
@@ -277,16 +244,9 @@ if len(Xr) > 0:
     plt.tight_layout()
 
     # 保存图像
-    plt.savefig('3d_cable_profile.png', dpi=600, bbox_inches='tight', facecolor='white')
-    #plt.savefig('3d_cable_profile.pdf', bbox_inches='tight', facecolor='white')
+    plt.savefig('output/Figures/3D_cable.png', dpi=600, bbox_inches='tight', facecolor='white')
+    print("3D plot generated and saved as 3D_cable.png ")
 
-    print("3D plot generated and saved as 3d_cable_profile.png and 3d_cable_profile.pdf")
-
-    # 尝试显示图形
-    try:
-        plt.show()
-    except:
-        print("Could not display plot, please check the saved image files")
 else:
     print("Error: No valid data to plot")
 

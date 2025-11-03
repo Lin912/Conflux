@@ -185,16 +185,19 @@ VectorXd Fx::fx() {
     };
 
     // 计算 BCtemp0 和 BCtemp1
-    VectorXd BCtemp0 = calculate_BCtemp(Ynew_segments[0], Vtx, Vty, Vtz);
-    VectorXd BCtemp1 = calculate_BCtemp(Ynew_segments[numSegments-1], Vbx, Vby, Vbz);
-    SPDLOG_DEBUG("FX LOG 5");
+    // VectorXd BCtemp0 = calculate_BCtemp(Ynew_segments[0], Vtx, Vty, Vtz);
+    // VectorXd BCtemp1 = calculate_BCtemp(Ynew_segments[numSegments-1], Vbx, Vby, Vbz);
+    // SPDLOG_DEBUG("FX LOG 5");
 
     // 创建最终的返回向量 ret
     VectorXd ret(numSegments*segmentSize);
     
     // 将前五个元素赋值为 BCtemp0，尾部五个元素赋值为 BCtemp1
-    ret.head(5) = BCtemp0;
-    ret.tail(5) = BCtemp1;
+    // ret.head(5) = BCtemp0;
+    // ret.tail(5) = BCtemp1;
+
+    ret.head(5).setZero();
+    ret.tail(5).setZero();
 
     // 使用循环简化 segment 的赋值操作
     for (int i = 0; i < numSegments-1; i++) {

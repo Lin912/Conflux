@@ -19,17 +19,41 @@ VectorXd FiberMain::initializeTransVal(int index) {
   } else {
     VectorXd a = VectorXd::Zero(TotNoV);
     for (int i = 0; i < Nodes; i++) {
-      a(i * 10 + 0) = 0; // u
-      a(i * 10 + 1) = 0; // v
-      a(i * 10 + 2) = 1e-30; // w
-      a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.100;     // T
-      a(i * 10 + 4) = 0;     // Sn
-      a(i * 10 + 5) = 0;     // Sb
-      a(i * 10 + 6) = 1e-11; // Theta
-      a(i * 10 + 7) = 1e-11; // Phi
-      a(i * 10 + 8) = 1e-11; // Omega
-      a(i * 10 + 9) = 1e-11; // Omega
-    }
+        if(i == 0){
+        a(i * 10 + 0) = 0.00; // u_0
+        a(i * 10 + 1) = 0.30; // v_0
+        a(i * 10 + 2) = 0.40; // w_0
+        a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.200;     // T_0
+        a(i * 10 + 4) = 0;     // Sn_0
+        a(i * 10 + 5) = 0;     // Sb_0
+        a(i * 10 + 6) = 1e-11; // Theta_0
+        a(i * 10 + 7) = 1e-11; // Phi_0
+        a(i * 10 + 8) = 0.0; // Omega_0
+        a(i * 10 + 9) = 0.0; // Omega_0
+      }else if(i < Nodes - 1 && i > 0){
+        a(i * 10 + 0) = 0.00; // u
+        a(i * 10 + 1) = 0.30 + ((0.00 - 0.30) / Nodes) * i; // v
+        a(i * 10 + 2) = 0.40 + ((0.35 - 0.40) / Nodes) * i; // w
+        a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.200;     // T
+        a(i * 10 + 4) = 0;     // Sn
+        a(i * 10 + 5) = 0;     // Sb
+        a(i * 10 + 6) = 1e-11; // Theta
+        a(i * 10 + 7) = 1e-11; // Phi
+        a(i * 10 + 8) = 1e-11; // Omega
+        a(i * 10 + 9) = 1e-11; // Omega
+      }else{
+        a(i * 10 + 0) = 0.00; // u
+        a(i * 10 + 1) = 0.00; // v
+        a(i * 10 + 2) = 0.35; // w
+        a(i * 10 + 3) = 0.0;     // T
+        a(i * 10 + 4) = 0;     // Sn
+        a(i * 10 + 5) = 0;     // Sb
+        a(i * 10 + 6) = 1e-11; // Theta
+        a(i * 10 + 7) = 1e-11; // Phi
+        a(i * 10 + 8) = 0.00; // Omega
+        a(i * 10 + 9) = 0.00; // Omega
+      }
+   }
     TransVal = a;
   }
   return TransVal;

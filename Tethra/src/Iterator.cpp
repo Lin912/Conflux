@@ -30,6 +30,10 @@ void Iterator::begin(int k) {
   fx = load.LF(k);
   jac = load.LJ(k);
 
+  Add bc_reload(Yold, Ynew, k);
+  Yold = bc_reload.Addyold();
+  Ynew = bc_reload.Addynew();
+
   for (int i = 0; i < times; i++) {
     cout << "Iteration " << i + 1 << " times; " << endl;
 
@@ -53,22 +57,47 @@ void Iterator::begin(int k) {
     // bicgstabSolver.torerance() = 1e-10;
     // VectorXd p = bicgstabSolver.solveWithGuess(fx, VectorXd::Zero(fx.size()));    
     //<- Searching Direction Funding//
-    
-    double Lambda = 1.0;  //The Lambda is 1.0
-    const double c = 1e-4;  //The Armijo condition constant
-    const double minLambda = 1e-6; // Minimum step size
 
-    double fxNorm = fx.norm(); // Norm of the current residual
+    VectorXd gradF = jac.transpose() * fx;
+    double descent_check = gradF.dot(p);
+
+    if(descent_check >= -1e-8) {
+        cout << "Warning: Newton direction failed descent check. Falling back to Steepest Descent." << endl;
+        // 最速下降方向 p_SD = -J^T * f = -gradF
+        p = -gradF; 
+        // 关键：由于最速下降方向的长度可能非常大，必须对其进行归一化或限制模长，
+        // 否则它可能会导致比牛顿法更严重的震荡和发散。
+        // 这里采用简单的归一化，将初始 Lambda 限制在较小值（例如 0.1）。
+        double p_norm = p.norm();
+        if (p_norm > 1e-12) {
+             // 归一化 p，并限制其最大步长
+             p = p / p_norm;
+        } 
+      }
+
+
+    //-> Backtracking Line Search with Armijo Condition//
+    double Lambda = 1.0;  //The Lambda is 1.0
+    const double c = 1e-08;  //The Armijo condition constant
+    const double minLambda = 1e-02; // Minimum step size
+
+    VectorXd fx_interior = fx.segment(5, TnoV - 10);
+    double fxNorm = fx_interior.norm(); // Norm of the current residual
     double newFxNorm = fxNorm;
 
     // Backtracking line search to satisfy the Armijo condition(core)
     while(Lambda > minLambda){
         VectorXd trialY = Ynew + Lambda * p;
 
+        Add trialBC(Yold, trialY, k); 
+        trialY = trialBC.Addynew();
+
         // Evaluate the new residual at the proposed step
         Load trialLoad(trialY, trialY);
         VectorXd fx_trial = trialLoad.LF(k);
-        newFxNorm = fx_trial.norm();
+
+        VectorXd fx_trial_interior = fx_trial.segment(5, TnoV - 10);
+        newFxNorm = fx_trial_interior.norm();
 
         // Check the Armijo condition
         if (newFxNorm <= (1.0 -c * Lambda) * fxNorm) {
@@ -83,7 +112,12 @@ void Iterator::begin(int k) {
     }
     
     // VectorXd deltaY = jac.inverse() * fx * (-1) * Lambda;
-    VectorXd deltaY = p * Lambda; 
+    VectorXd deltaY = p * Lambda;
+
+    VectorXd updatedY = Ynew + deltaY;
+    Add finalBC(Yold, updatedY, k);
+    deltaY = finalBC.Addynew() - Ynew;
+
     updateY(deltaY);
 
     saveIterationResults(i);
@@ -98,7 +132,8 @@ void Iterator::begin(int k) {
 
     if (maxIncrementalPercentage < Error || maxFx < Error) { //The Max Error
       cout << "Iteration converge :)" << endl;
-      continue; // Condition satisfiedreak;
+      // continue; // Condition satisfiedreak;
+      break;
     } else {
       updateNextIteration(k);
     }

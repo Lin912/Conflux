@@ -62,24 +62,24 @@ SparseMatrix<double> Jacobian::jacobian() {
     std::vector<Triplet<double>> triplets;
 
     triplets.push_back(Triplet<double>(0, 0, 1));
-    triplets.push_back(Triplet<double>(0, 6, Vtz * cosY6 + Vtx * cosY7 * sinY6 + Vty * sinY7 * sinY6));
-    triplets.push_back(Triplet<double>(0, 7, Vtx * cosY6 * sinY7 - Vty * cosY7 * cosY6));
+    // triplets.push_back(Triplet<double>(0, 6, Vtz * cosY6 + Vtx * cosY7 * sinY6 + Vty * sinY7 * sinY6));
+    // triplets.push_back(Triplet<double>(0, 7, Vtx * cosY6 * sinY7 - Vty * cosY7 * cosY6));
     triplets.push_back(Triplet<double>(1, 1, 1));
-    triplets.push_back(Triplet<double>(1, 7, Vtx * cosY7 + Vty * sinY7));
+    // triplets.push_back(Triplet<double>(1, 7, Vtx * cosY7 + Vty * sinY7));
     triplets.push_back(Triplet<double>(2, 2, 1));
-    triplets.push_back(Triplet<double>(2, 6, Vtz * sinY6 - Vtx * cosY7 * cosY6 - Vty * cosY6 * sinY7));
-    triplets.push_back(Triplet<double>(2, 7, Vtx * sinY7 * sinY6 - Vty * cosY7 * sinY6));
+    // triplets.push_back(Triplet<double>(2, 6, Vtz * sinY6 - Vtx * cosY7 * cosY6 - Vty * cosY6 * sinY7));
+    // triplets.push_back(Triplet<double>(2, 7, Vtx * sinY7 * sinY6 - Vty * cosY7 * sinY6));
     triplets.push_back(Triplet<double>(3, 8, 1));
     triplets.push_back(Triplet<double>(4, 9, 1));
 
     triplets.push_back(Triplet<double>(TnoV-5, TnoV-10, 1));
-    triplets.push_back(Triplet<double>(TnoV-5, TnoV-4, Vbz * cosYN96 + Vbx * cosYN97 * sinYN96 + Vby * sinYN97 * sinYN96));
-    triplets.push_back(Triplet<double>(TnoV-5, TnoV-3, Vbx * cosYN96 * sinYN97 - Vby * cosYN97 * cosYN96));
+    // triplets.push_back(Triplet<double>(TnoV-5, TnoV-4, Vbz * cosYN96 + Vbx * cosYN97 * sinYN96 + Vby * sinYN97 * sinYN96));
+    // triplets.push_back(Triplet<double>(TnoV-5, TnoV-3, Vbx * cosYN96 * sinYN97 - Vby * cosYN97 * cosYN96));
     triplets.push_back(Triplet<double>(TnoV-4, TnoV-9, 1));
-    triplets.push_back(Triplet<double>(TnoV-4, TnoV-3, Vbx * cosYN97 + Vby * sinYN97));
+    // triplets.push_back(Triplet<double>(TnoV-4, TnoV-3, Vbx * cosYN97 + Vby * sinYN97));
     triplets.push_back(Triplet<double>(TnoV-3, TnoV-8, 1));
-    triplets.push_back(Triplet<double>(TnoV-3, TnoV-4, Vbz * sinYN96 - Vbx * cosYN97 * cosYN96 - Vby * cosYN96 * sinYN97));
-    triplets.push_back(Triplet<double>(TnoV-3, TnoV-3, Vbx * sinYN97 * sinYN96 - Vby * cosYN97 * sinYN96));
+    // triplets.push_back(Triplet<double>(TnoV-3, TnoV-4, Vbz * sinYN96 - Vbx * cosYN97 * cosYN96 - Vby * cosYN96 * sinYN97));
+    // triplets.push_back(Triplet<double>(TnoV-3, TnoV-3, Vbx * sinYN97 * sinYN96 - Vby * cosYN97 * sinYN96));
     triplets.push_back(Triplet<double>(TnoV-2, TnoV-2, 1));
     triplets.push_back(Triplet<double>(TnoV-1, TnoV-1, 1));
 
