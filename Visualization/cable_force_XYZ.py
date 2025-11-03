@@ -63,17 +63,17 @@ for col_idx, (point_idx, point_name, color) in enumerate(zip(points_to_plot, poi
     # 第一行: Fx (张力)
     plot_subplot(axs[0, col_idx], t, Fx[:, point_idx], 
                 f"FX at {point_name}", "Time(s)", "FX(N)", 
-                [0, 2], [-60, 60], color)
+                [0, 5], [-60, 60], color)
     
     # 第二行: Fy
     plot_subplot(axs[1, col_idx], t, Fy[:, point_idx], 
                 f"FY at {point_name}", "Time(s)", "FY(N)", 
-                [0, 2], [-6.0, 6.0], color)
+                [0, 5], [-6.0, 6.0], color)
     
     # 第三行: Fz
     plot_subplot(axs[2, col_idx], t, Fz[:, point_idx], 
                 f"FZ at {point_name}", "Time(s)", "FZ(N)", 
-                [0, 2], [-4.0, 4.0], color)
+                [0, 5], [-4.0, 4.0], color)
 
 # 调整布局
 plt.tight_layout()

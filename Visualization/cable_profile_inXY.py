@@ -90,10 +90,20 @@ X1, X100 = data_new[:, 0], data_new[:, 297]
 Y1, Y100 = data_new[:, 1], data_new[:, 298]
 Z1, Z100 = data_new[:, 2], data_new[:, 299]
 
+# 图线颜色
+colors = {
+    'X1': '#320a72',    
+    'X100': '#320a72',   
+    'Y1': '#500f04',     
+    'Y100': '#500f04',   
+    'Z1': '#274400',     
+    'Z100': '#274400'    
+}
+
 # 统一绘图参数
-def plot_displacement(t, data, title, subplot_pos):
+def plot_displacement(t, data, title, subplot_pos, color):
     plt.subplot(2, 3, subplot_pos)
-    plt.plot(t, data, '-', linewidth=1.2)
+    plt.plot(t, data, '-', linewidth=1.6, color = color)
     plt.xlim([0, 4])
     plt.ylim([-0.2, 0.2])
     plt.xticks(np.arange(0, 4.5, 0.5))
@@ -106,12 +116,12 @@ def plot_displacement(t, data, title, subplot_pos):
 # 绘图
 plt.figure(figsize=(15, 8))
 
-plot_displacement(t, Y1,    "Point01's  Displacement at in Y-direction", 2)
-plot_displacement(t, Y100,  "Point100's Displacement at in Y-direction", 5)
-plot_displacement(t, X1,    "Point01's  Displacement at in X-direction", 1)
-plot_displacement(t, X100,  "Point100's Displacement at in X-direction", 4)
-plot_displacement(t, Z1,    "Point01's  Displacement at in Z-direction", 3)
-plot_displacement(t, Z100,  "Point100's Displacement at in Z-direction", 6)
+plot_displacement(t, Y1,    "Point01's  Displacement at in Y-direction", 2, colors['Y1'])
+plot_displacement(t, Y100,  "Point100's Displacement at in Y-direction", 5, colors['Y100'])
+plot_displacement(t, X1,    "Point01's  Displacement at in X-direction", 1, colors['X1'])
+plot_displacement(t, X100,  "Point100's Displacement at in X-direction", 4, colors['X100'])
+plot_displacement(t, Z1,    "Point01's  Displacement at in Z-direction", 3, colors['Z1'])
+plot_displacement(t, Z100,  "Point100's Displacement at in Z-direction", 6, colors['Z100'])
 
 plt.tight_layout()
 
