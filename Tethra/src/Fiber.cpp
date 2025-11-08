@@ -21,9 +21,9 @@ VectorXd FiberMain::initializeTransVal(int index) {
     for (int i = 0; i < Nodes; i++) {
         if(i == 0){
         a(i * 10 + 0) = 0.00; // u_0
-        a(i * 10 + 1) = 0.30; // v_0
-        a(i * 10 + 2) = 0.40; // w_0
-        a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.200;     // T_0
+        a(i * 10 + 1) = 1E-30; // v_0
+        a(i * 10 + 2) = 0.00; // w_0
+        a(i * 10 + 3) = 3.489 + (Nodes - (i+1)) * 0.065 * 1.21;     // T_0
         a(i * 10 + 4) = 0;     // Sn_0
         a(i * 10 + 5) = 0;     // Sb_0
         a(i * 10 + 6) = 1e-11; // Theta_0
@@ -31,10 +31,10 @@ VectorXd FiberMain::initializeTransVal(int index) {
         a(i * 10 + 8) = 0.0; // Omega_0
         a(i * 10 + 9) = 0.0; // Omega_0
       }else if(i < Nodes - 1 && i > 0){
-        a(i * 10 + 0) = 0.00; // u
-        a(i * 10 + 1) = 0.30 + ((0.00 - 0.30) / Nodes) * i; // v
-        a(i * 10 + 2) = 0.40 + ((0.35 - 0.40) / Nodes) * i; // w
-        a(i * 10 + 3) = 0.0 + (Nodes - (i+1)) * 0.138 * 0.200;     // T
+        a(i * 10 + 0) = 0.00 + ((0.00 - 0.00) / Nodes) * i; // u
+        a(i * 10 + 1) = 1E-30; // v
+        a(i * 10 + 2) = 0.00 + ((0.00 - 0.00) / Nodes) * i; // w
+        a(i * 10 + 3) = 3.489 + (Nodes - (i+1)) * 0.065 * 1.21;     // T
         a(i * 10 + 4) = 0;     // Sn
         a(i * 10 + 5) = 0;     // Sb
         a(i * 10 + 6) = 1e-11; // Theta
@@ -43,9 +43,9 @@ VectorXd FiberMain::initializeTransVal(int index) {
         a(i * 10 + 9) = 1e-11; // Omega
       }else{
         a(i * 10 + 0) = 0.00; // u
-        a(i * 10 + 1) = 0.00; // v
-        a(i * 10 + 2) = 0.35; // w
-        a(i * 10 + 3) = 0.0;     // T
+        a(i * 10 + 1) = 1E-30; // v
+        a(i * 10 + 2) = 0.00; // w
+        a(i * 10 + 3) = 3.489;     // T
         a(i * 10 + 4) = 0;     // Sn
         a(i * 10 + 5) = 0;     // Sb
         a(i * 10 + 6) = 1e-11; // Theta
@@ -64,15 +64,18 @@ MatrixXd FiberMain::initializeZeroMatrix() {
 }
 
 void FiberMain::Calculation(int index) {
-  VectorXd TransVal = initializeTransVal(index);
+  VectorXd Ynew_current_guess = initializeTransVal(index);
+  VectorXd Yold_previous_state = Ynew_current_guess;
+  // VectorXd TransVal = initializeTransVal(index);
 
   cout << endl;
   cout << "Time Step : " << index << "     Now the real time is "
        << index * DelTime << "s";
 
-  Iterator b(TransVal, TransVal, times, Error);
+  Iterator b(Yold_previous_state, Ynew_current_guess, times, Error);
   b.begin(index);
-  TransVal = b.out();
+
+  VectorXd ConvergedY = b.out();
 
   MatrixXd zero = initializeZeroMatrix();
 
@@ -82,11 +85,11 @@ void FiberMain::Calculation(int index) {
   }
 
   for (int j = 0; j < TotNoV; j++) {
-    zero(index, j) = TransVal(j);
+    zero(index, j) = ConvergedY(j);
   }
 
   FiberRO a;
   a.Output(zero, TimeStep, TotNoV);
-  // a.OutTopforce(TransVal);
-  a.OutBottomforce(TransVal);
+  // a.OutTopforce(ConvergedY);
+  a.OutBottomforce(ConvergedY);
 }

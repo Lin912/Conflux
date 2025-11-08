@@ -20,32 +20,25 @@ private:
 
     VectorXd fx;  // Stores fx
     // MatrixXd jac;  // Stores Dense jacobian
-    Eigen::SparseMatrix<double> jac;  // Stores sparse jacobian
+    SparseMatrix<double> jac;  // Stores sparse jacobian
 
     VectorXd Yold;  // Temporary storage for Yold
-    VectorXd Ynew;  // Temporary storage for Ynew
+    VectorXd &Ynew;  // Temporary storage for Ynew
 
     // Save matrix to file
     void savetxt(const Eigen::MatrixXd& mat, const string& filename) const;
     void savetxt(const Eigen::SparseMatrix<double>& mat, const string& filename) const;
-
-    void updateY(const VectorXd& deltaY);
+    
     void saveIterationResults(int iteration);
     double calculateMaxIncrementalPercentage(const VectorXd& deltaY);
     double calculateMaxFx();
-    void updateNextIteration(int k);
-
-
+   
 public:
-    // Constructor
     Iterator(VectorXd& arr, VectorXd& brr, int a, double b);
-    
-    // Destructor
     ~Iterator();
 
-    // Begin iteration process
     void begin(int k);
-    // Return the final Ynew
     VectorXd out();
-
+    void updateY(const VectorXd& deltaY);
+    void updateNextIteration(int k);
 };

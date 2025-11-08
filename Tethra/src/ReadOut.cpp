@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../csv/TopVel4_A0.3_T2.0_Z0.40_20s/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+    : fileTopVel("../csv/TopVel4_Hanging/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
       fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
       fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
       fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),
@@ -489,7 +489,7 @@ vector<double> FiberRO::ReadBottomVel() {
   vector<double> omegaRelative = readLastLineData(fileBottomomegaRelative);
   vector<double> Eulerangle = readLastLineData(fileBottomEulerAngle);
   ////////////////////////////////////////////////////Towingpoint Position
-  vector<double> R = {-0.22, 0.0, -0.00497};
+  vector<double> R = {-0.220, 0.000, -0.00497};
   ////////////////////////////////////////////////////Towingpoint Position
 
   Matrix3x3 E = computeRotationMatrix(Eulerangle);

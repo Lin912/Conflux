@@ -8,7 +8,7 @@ constexpr int TnoV = 1000;  //TnoV = Nodes* Variables
 
 //Fiber.cpp
 constexpr int times = 300;  //Iterate Times
-constexpr double Error = 1e-10;
+constexpr double Error = 1e-15;
 constexpr double DelTime = 0.001;
 constexpr int TimeStep = 20000;
 constexpr int TotNoV = 1000;    //TotNoV = TnoV

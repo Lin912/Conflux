@@ -103,7 +103,7 @@ VectorXd Fx::fx() {
             }
         }
     }
-    SPDLOG_DEBUG("FX LOG 1");
+    // SPDLOG_DEBUG("FX LOG 1");
 
     std::vector<MatrixXd> Nold(numSegments, MatrixXd(segmentSize, segmentSize));
     std::vector<MatrixXd> Nnew(numSegments, MatrixXd(segmentSize, segmentSize));
@@ -135,7 +135,7 @@ VectorXd Fx::fx() {
         }
     }
 
-    SPDLOG_DEBUG("FX LOG 2");
+    // SPDLOG_DEBUG("FX LOG 2");
 
     // 存储 Qold 和 Qnew 向量
     std::vector<VectorXd> Qold(numSegments, VectorXd(segmentSize));
@@ -153,7 +153,7 @@ VectorXd Fx::fx() {
         }
     }
 
-    SPDLOG_DEBUG("FX LOG 3");
+    // SPDLOG_DEBUG("FX LOG 3");
     // 创建一个 temp 数组存储每个计算结果
     std::vector<VectorXd> temp(numSegments-1, VectorXd(segmentSize));
 
@@ -166,7 +166,7 @@ VectorXd Fx::fx() {
                     + ((Qold[i] + Qold[i+1] + Qnew[i] + Qnew[i+1]) * (deltaT * deltaS));
     }
 
-    SPDLOG_DEBUG("FX LOG 4");
+    // SPDLOG_DEBUG("FX LOG 4");
 
     // 定义一个计算 BCtemp 的 lambda 函数
         auto calculate_BCtemp = [](const VectorXd& Ynew, double Vx, double Vy, double Vz) {
@@ -185,19 +185,19 @@ VectorXd Fx::fx() {
     };
 
     // 计算 BCtemp0 和 BCtemp1
-    // VectorXd BCtemp0 = calculate_BCtemp(Ynew_segments[0], Vtx, Vty, Vtz);
-    // VectorXd BCtemp1 = calculate_BCtemp(Ynew_segments[numSegments-1], Vbx, Vby, Vbz);
+    VectorXd BCtemp0 = calculate_BCtemp(Ynew_segments[0], Vtx, Vty, Vtz);
+    VectorXd BCtemp1 = calculate_BCtemp(Ynew_segments[numSegments-1], Vbx, Vby, Vbz);
     // SPDLOG_DEBUG("FX LOG 5");
 
     // 创建最终的返回向量 ret
     VectorXd ret(numSegments*segmentSize);
     
     // 将前五个元素赋值为 BCtemp0，尾部五个元素赋值为 BCtemp1
-    // ret.head(5) = BCtemp0;
-    // ret.tail(5) = BCtemp1;
+    ret.head(5) = BCtemp0;
+    ret.tail(5) = BCtemp1;
 
-    ret.head(5).setZero();
-    ret.tail(5).setZero();
+    // ret.head(5).setZero();
+    // ret.tail(5).setZero();
 
     // 使用循环简化 segment 的赋值操作
     for (int i = 0; i < numSegments-1; i++) {
