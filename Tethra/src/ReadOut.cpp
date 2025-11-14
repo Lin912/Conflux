@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../csv/TopVel4_Hanging/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+    : fileTopVel("../csv/TopVel4_A0.5_T2.0_Z0.40_20s_Horizonal/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
       fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
       fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
       fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),

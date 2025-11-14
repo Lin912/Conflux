@@ -19,39 +19,39 @@ VectorXd FiberMain::initializeTransVal(int index) {
   } else {
     VectorXd a = VectorXd::Zero(TotNoV);
     for (int i = 0; i < Nodes; i++) {
-        if(i == 0){
-        a(i * 10 + 0) = 0.00; // u_0
-        a(i * 10 + 1) = 1E-30; // v_0
-        a(i * 10 + 2) = 0.00; // w_0
-        a(i * 10 + 3) = 3.489 + (Nodes - (i+1)) * 0.065 * 1.21;     // T_0
-        a(i * 10 + 4) = 0;     // Sn_0
-        a(i * 10 + 5) = 0;     // Sb_0
-        a(i * 10 + 6) = 1e-11; // Theta_0
-        a(i * 10 + 7) = 1e-11; // Phi_0
-        a(i * 10 + 8) = 0.0; // Omega_0
-        a(i * 10 + 9) = 0.0; // Omega_0
+      if(i == 0){
+        a(i * 10 + 0) = 0.000;                                        // u_0
+        a(i * 10 + 1) = 0.500;                                        // v_0
+        a(i * 10 + 2) = 0.400;                                        // w_0
+        a(i * 10 + 3) = 0.000 + (Nodes - (i+1)) * 0.200 * 0.138;      // T_0
+        a(i * 10 + 4) = 0.000;                                        // Sn_0
+        a(i * 10 + 5) = 0.000;                                        // Sb_0
+        a(i * 10 + 6) = 1e-11;                                        // Theta_0
+        a(i * 10 + 7) = 1e-11;                                        // Phi_0
+        a(i * 10 + 8) = 0.000;                                        // Omega_0
+        a(i * 10 + 9) = 0.000;                                        // Omega_0
       }else if(i < Nodes - 1 && i > 0){
-        a(i * 10 + 0) = 0.00 + ((0.00 - 0.00) / Nodes) * i; // u
-        a(i * 10 + 1) = 1E-30; // v
-        a(i * 10 + 2) = 0.00 + ((0.00 - 0.00) / Nodes) * i; // w
-        a(i * 10 + 3) = 3.489 + (Nodes - (i+1)) * 0.065 * 1.21;     // T
-        a(i * 10 + 4) = 0;     // Sn
-        a(i * 10 + 5) = 0;     // Sb
-        a(i * 10 + 6) = 1e-11; // Theta
-        a(i * 10 + 7) = 1e-11; // Phi
-        a(i * 10 + 8) = 1e-11; // Omega
-        a(i * 10 + 9) = 1e-11; // Omega
+        a(i * 10 + 0) = 0.000;                                        // u
+        a(i * 10 + 1) = 0.500 + ((0.000 - 0.500) / Nodes) * i;        // v
+        a(i * 10 + 2) = 0.400 + ((0.350 - 0.400) / Nodes) * i;        // w
+        a(i * 10 + 3) = 0.000 + (Nodes - (i+1)) * 0.200 * 0.138;      // T
+        a(i * 10 + 4) = 0.000;                                        // Sn
+        a(i * 10 + 5) = 0.000;                                        // Sb
+        a(i * 10 + 6) = 1e-11;                                        // Theta
+        a(i * 10 + 7) = 1e-11;                                        // Phi
+        a(i * 10 + 8) = 1e-11;                                        // Omega
+        a(i * 10 + 9) = 1e-11;                                        // Omega
       }else{
-        a(i * 10 + 0) = 0.00; // u
-        a(i * 10 + 1) = 1E-30; // v
-        a(i * 10 + 2) = 0.00; // w
-        a(i * 10 + 3) = 3.489;     // T
-        a(i * 10 + 4) = 0;     // Sn
-        a(i * 10 + 5) = 0;     // Sb
-        a(i * 10 + 6) = 1e-11; // Theta
-        a(i * 10 + 7) = 1e-11; // Phi
-        a(i * 10 + 8) = 0.00; // Omega
-        a(i * 10 + 9) = 0.00; // Omega
+        a(i * 10 + 0) = 0.000;                                        // u
+        a(i * 10 + 1) = 0.000;                                        // v
+        a(i * 10 + 2) = 0.350;                                        // w
+        a(i * 10 + 3) = 0.000 + (Nodes - (i+1)) * 0.200 * 0.138;      // T
+        a(i * 10 + 4) = 0.000;                                        // Sn
+        a(i * 10 + 5) = 0.000;                                        // Sb
+        a(i * 10 + 6) = 1e-11;                                        // Theta
+        a(i * 10 + 7) = 1e-11;                                        // Phi
+        a(i * 10 + 8) = 0.000;                                        // Omega
+        a(i * 10 + 9) = 0.000;                                        // Omega
       }
    }
     TransVal = a;
@@ -75,7 +75,7 @@ void FiberMain::Calculation(int index) {
   Iterator b(Yold_previous_state, Ynew_current_guess, times, Error);
   b.begin(index);
 
-  VectorXd ConvergedY = b.out();
+  // VectorXd ConvergedY = b.out();
 
   MatrixXd zero = initializeZeroMatrix();
 
@@ -85,11 +85,11 @@ void FiberMain::Calculation(int index) {
   }
 
   for (int j = 0; j < TotNoV; j++) {
-    zero(index, j) = ConvergedY(j);
+    zero(index, j) = b.out()(j);
   }
 
   FiberRO a;
   a.Output(zero, TimeStep, TotNoV);
   // a.OutTopforce(ConvergedY);
-  a.OutBottomforce(ConvergedY);
+  a.OutBottomforce(b.out());
 }

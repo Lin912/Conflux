@@ -99,7 +99,7 @@ void Iterator::begin(int k) {
     //-> Backtracking Line Search with Armijo Condition//
     double fxNorm = fx.norm();
     double Lambda = 1.000;  //The Lambda is 1.0
-    const double c = 1e-08;  //The Armijo condition constant
+    const double c = 1e-02;  //The Armijo condition constant(As c is greater, the condition is more strict)
     const double minLambda = 1e-08; // Minimum step size
 
     VectorXd Ynew_trial;
@@ -115,10 +115,11 @@ void Iterator::begin(int k) {
         normFx_trial = Fx_trial.norm();
 
         // Check the Armijo condition
-        if (normFx_trial < (1.0 - 0.0001 * Lambda) * fxNorm || Lambda < minLambda) {
+        if (normFx_trial < (1.0 - c * Lambda) * fxNorm || Lambda < minLambda) {
             break;
-        }
+        } else{
         Lambda *= 0.5;
+        }
     }
         
     // UpDate Ynew
@@ -128,17 +129,15 @@ void Iterator::begin(int k) {
     updateNextIteration(k);
     
     // Save the TEMP Results in Iteration step
-    saveIterationResults(i);
+    // saveIterationResults(i);
 
     // Convergence Check
     double maxIncrementalPercentage = calculateMaxIncrementalPercentage(Lambda * p);
     double maxFx = calculateMaxFx();
     
-    if (maxIncrementalPercentage < Error || maxFx < Error) {
-      cout << "Iteration converge :)" << endl;
+    if (maxIncrementalPercentage < InpError && maxFx < Error) {
+      cout << "Iteration converge [Strict] :)" << endl;
       break;
-    } else {
-      updateNextIteration(k);
     }
 
     cout << "Lambda used: " << Lambda << endl;
@@ -166,24 +165,12 @@ void Iterator::saveIterationResults(int iteration) {
 
 double Iterator::calculateMaxIncrementalPercentage(const VectorXd &deltaY) {
   SPDLOG_DEBUG("Calculating max incremental percentage");
-  double amax = 0;
+  double amax = 0.0;
 
   for (int i = 10; i < TnoV - 10; i++){
-    if (Yold(i) != 0){
-      double a = abs(deltaY(i)) / abs(Yold(i));
+    if (Ynew(i) != 0){
+      double a = abs(deltaY(i)) / abs(Ynew(i));
       amax = std::max(amax,a);
-    }
-  }
-
-  for (int i = 3; i < 8; ++i){
-    if (Yold(i) != 0){
-      amax = std::max(amax, abs(deltaY(i)) / abs(Yold(i)));
-    }
-  }
-
-  for (int i = TnoV - 7; i < TnoV - 2; ++i){
-    if (Yold(i) != 0){
-      amax = std::max(amax, abs(deltaY(i)) / abs(Yold(i)));
     }
   }
 

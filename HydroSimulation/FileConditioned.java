@@ -66,15 +66,15 @@ public class FileConditioned extends StarMacro {
                         }
                         
                         double forceX = -forceComponents[0];
-                        double forceY = forceComponents[1];
-                        double forceZ = forceComponents[2];
+                        double forceY = -forceComponents[1];
+                        double forceZ = -forceComponents[2];
 
                         ContinuumBody continuumBody = ((ContinuumBody) simulation.get(star.sixdof.BodyManager.class).getObject("MainBody"));//Body's Name
                         ExternalForce externalForce = ((ExternalForce) continuumBody.getExternalForceAndMomentManager().getObject("CableForce"));//Force's Name              
                         Units units_0 = ((Units) simulation.getUnitsManager().getObject("N"));
                         externalForce.getForce().setComponentsAndUnits(forceX, forceY, forceZ, units_0);//Force value
                         Units units_1 = ((Units) simulation.getUnitsManager().getObject("m"));
-                        externalForce.getPositionAsCoordinate().setCoordinate(units_1, units_1, units_1, new DoubleVector(new double[] {-0.0465, 0.0, 0.0}));//Force acting point
+                        externalForce.getPositionAsCoordinate().setCoordinate(units_1, units_1, units_1, new DoubleVector(new double[] {-0.22, 0.0, -0.00497}));//Force acting point
                         
                         //Running simulation
                         int t0 = simulation.getSimulationIterator().getCurrentIteration();
@@ -108,7 +108,7 @@ public class FileConditioned extends StarMacro {
                         ReportMonitor reportMonitor_9 = ((ReportMonitor) simulation.getMonitorManager().getMonitor("rz"));//Monitor's Name
                         simulation.getMonitorManager().export(FILE_PATH_EULERANGLE, ",", new NeoObjectVector(new Object[] {reportMonitor_7, reportMonitor_8, reportMonitor_9}));//Output fileName
 
-                        simulation.saveState("star.sim");
+			simulation.saveState("star.sim");
                         simulation.println("Step Completed");
 
                         buffer.putInt(OFFSET_PROGRAM_CITRINE, 1);
@@ -117,11 +117,11 @@ public class FileConditioned extends StarMacro {
                     }
 
                     try{
-                        Thread.sleep(1000);
+                        Thread.sleep(5000);
                     } catch(InterruptedException e){
                         simulation.println("Thread interrupted: " + e.getMessage());
                     }
-                        
+ 			                       
                     simulation.println("Printing Mapped File Content");
                     MappedByteBuffer readBuffer = buffer.duplicate();
                     readBuffer.position(0);
