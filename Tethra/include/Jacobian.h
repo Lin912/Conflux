@@ -64,7 +64,7 @@ class Jacobian
         
 
     public:
-        Jacobian(VectorXd& arr, VectorXd& brr, int index);
+        Jacobian(const VectorXd &arr, const VectorXd &brr, int index);
         ~Jacobian();
 
         int sign(double a);

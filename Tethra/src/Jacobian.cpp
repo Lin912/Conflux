@@ -2,8 +2,8 @@
 
 using namespace Eigen;
 
-Jacobian::Jacobian(VectorXd& arr, VectorXd& brr, int index)
-    : Ynew(arr), Yold(brr), k(index)
+Jacobian::Jacobian(const VectorXd &arr, const VectorXd &brr, int index)
+    : Yold(arr), Ynew(brr), k(index)
 {
     FiberRO a;
     PhysicalData physicalData = ParaReader::ReadAllPhysicalData(a, index);

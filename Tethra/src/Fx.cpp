@@ -3,7 +3,7 @@
 #include <thread>
 #include <spdlog/spdlog.h>
 
-Fx::Fx(VectorXd& arr, VectorXd& brr, int index)
+Fx::Fx(const VectorXd &arr, const VectorXd &brr, int index)
     : Yold(arr), Ynew(brr), k(index)
 {
     FiberRO a;
