@@ -2,8 +2,8 @@
 
 using namespace Eigen;
 
-Jacobian::Jacobian(VectorXd& arr, VectorXd& brr, int index)
-    : Ynew(arr), Yold(brr), k(index)
+Jacobian::Jacobian(const VectorXd &arr, const VectorXd &brr, int index)
+    : Yold(arr), Ynew(brr), k(index)
 {
     FiberRO a;
     PhysicalData physicalData = ParaReader::ReadAllPhysicalData(a, index);
@@ -53,7 +53,9 @@ Jacobian::Jacobian(VectorXd& arr, VectorXd& brr, int index)
 
 Jacobian::~Jacobian() {}
 
-SparseMatrix<double> Jacobian::jacobian() {
+
+// Hardcoded configuration of Jacobian Matrix
+SparseMatrix<double> Jacobian::jacobian_HC() {
 
     SparseMatrix<double> temp(TnoV, TnoV);
     double cosY6 = cos(Ynew(6)), cosY7 = cos(Ynew(7)), cosYN96 = cos(Ynew(TnoV-4)), cosYN97 = cos(Ynew(TnoV-3));
@@ -315,22 +317,56 @@ SparseMatrix<double> Jacobian::jacobian() {
     return temp;  
 }
 
+// Based on the Numerical Differentiation Method(NDM) -> Sparse Coloring
+SparseMatrix<double> Jacobian::jacobian_NDM() {
+    SPDLOG_DEBUG("Calculating Jacobian using Numerical Differentiation(NDM_FD)");
+
+    const double epsilon = 1e-7;
+    const int n = TnoV;
+
+    SparseMatrix<double> J(n, n);
+    std::vector<Triplet<double>> triplets;
+    
+    triplets.reserve(n * 30);
+
+    Fx base_fx_solver(Yold, Ynew, k);
+    VectorXd F0 = base_fx_solver.fx();
+
+    for (int j = 0; j < n; ++j) {
+        VectorXd Y_perturbed = Ynew;
+        Y_perturbed(j) += epsilon;
+
+        Fx perturbed_solver(Yold, Y_perturbed, k);
+        VectorXd F_p = perturbed_solver.fx();
+
+        VectorXd delta = (F_p - F0) / epsilon;
+
+        int current_node = j / Variables;
+
+        int start_node = std::max(0, current_node - 1);
+        int end_node = std::min(Nodes, current_node + 2);
+
+        int start_idx = start_node * Variables;
+        int end_idx = std::min(n, end_node * Variables);
+
+        for (int i = start_idx; i < end_idx; ++i) {
+            if (std::abs(delta(i)) > 1e-12) {
+                triplets.push_back(Triplet<double>(i, j, delta(i)));
+            }
+        }
+    }
+
+    J.setFromTriplets(triplets.begin(), triplets.end());
+    
+    SPDLOG_DEBUG("Jacobian calculation done. Non-zeros: {}", J.nonZeros());
+    
+    return J;
+}
+
 
 int Jacobian::sign(double a)
 {
-    if(a > 0)
-    {
-        return 1;
-    }
-    else
-    {
-        if(a < 0)
-        {
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    if(a > 0) return 1;
+    if(a < 0) return -1;
+    return 0;
 }

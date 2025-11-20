@@ -3,7 +3,10 @@
 #include <thread>
 #include <spdlog/spdlog.h>
 
-Fx::Fx(VectorXd& arr, VectorXd& brr, int index)
+using namespace std;
+using namespace Eigen;
+
+Fx::Fx(const VectorXd &arr, const VectorXd &brr, int index)
     : Yold(arr), Ynew(brr), k(index)
 {
     FiberRO a;
@@ -45,11 +48,6 @@ Fx::Fx(VectorXd& arr, VectorXd& brr, int index)
     Ax = physicalData.Ax;
     Ay = physicalData.Ay;
     Az = physicalData.Az;
-
-    // Timestep = physicalData.TS;
-    // Nodes = physicalData.NODES;
-    // Variables = physicalData.VARIABLES;
-    // TnoV = physicalData.TNOV;
 }
 
 Fx::~Fx()
@@ -60,155 +58,98 @@ VectorXd Fx::fx() {
     int numSegments = Nodes;
     int segmentSize = Variables;
 
-    std::vector<VectorXd> Yold_segments(numSegments, VectorXd::Zero(segmentSize));
-    std::vector<VectorXd> Ynew_segments(numSegments, VectorXd::Zero(segmentSize));
-
-    //Cutting the Yold and Ynew into segments
-    for (int i = 0; i < numSegments; i++) {
-        int startIdx = i * segmentSize;
-        int length = segmentSize;
-
-        Yold_segments[i] = Yold.segment(startIdx, length);
-        Ynew_segments[i] = Ynew.segment(startIdx, length);
-    }
-
-    SPDLOG_DEBUG("FX LOG 0");
-
     MNQ AA(Yold, Ynew, k);
 
-    std::vector<MatrixXd> Mold(numSegments, MatrixXd(segmentSize, segmentSize));
-    std::vector<MatrixXd> Mnew(numSegments, MatrixXd(segmentSize, segmentSize));
-
-    for (int i = 0; i < numSegments; i++) {
-        int startIdx = i * segmentSize;
-        int length = segmentSize;
-        
-        Mold[i] = Eigen::SparseMatrix<double>(length, length);
-        Mnew[i] = Eigen::SparseMatrix<double>(length, length);    
+    SparseMatrix<double> BigMold = AA.Mold();
+    SparseMatrix<double> BigMnew = AA.Mnew();
+    SparseMatrix<double> BigNold = AA.Nold();
+    SparseMatrix<double> BigNnew = AA.Nnew();
     
-        // 将子矩阵的非零元素插入到新矩阵中
-        for (int kold = startIdx; kold < startIdx + length; ++kold) {
-            for (Eigen::SparseMatrix<double>::InnerIterator it(AA.Mold(), kold); it; ++it) {
-                if (it.row() >= startIdx && it.row() < startIdx + length && it.col() >= startIdx && it.col() < startIdx + length) {
-                    Mold[i].coeffRef(it.row() - startIdx, it.col() - startIdx) = it.value();
-                }
-            }   
-        }
-        // 对 Mnew 做相同操作
-        for (int knew = startIdx; knew < startIdx + length; ++knew) {
-            for (Eigen::SparseMatrix<double>::InnerIterator it(AA.Mnew(), knew); it; ++it) {
-                if (it.row() >= startIdx && it.row() < startIdx + length && it.col() >= startIdx && it.col() < startIdx + length) {
-                    Mnew[i].coeffRef(it.row() - startIdx, it.col() - startIdx) = it.value();
-                }
-            }
-        }
-    }
-    // SPDLOG_DEBUG("FX LOG 1");
+    VectorXd BigQold = AA.Qold();
+    VectorXd BigQnew = AA.Qnew();
 
-    std::vector<MatrixXd> Nold(numSegments, MatrixXd(segmentSize, segmentSize));
-    std::vector<MatrixXd> Nnew(numSegments, MatrixXd(segmentSize, segmentSize));
+    std::vector<VectorXd> Yold_segments(numSegments);
+    std::vector<VectorXd> Ynew_segments(numSegments);
+    std::vector<VectorXd> Qold_vec(numSegments);
+    std::vector<VectorXd> Qnew_vec(numSegments);
 
     for (int i = 0; i < numSegments; i++) {
         int startIdx = i * segmentSize;
-        int length = segmentSize;
+        Yold_segments[i] = Yold.segment(startIdx, segmentSize);
+        Ynew_segments[i] = Ynew.segment(startIdx, segmentSize);
+        Qold_vec[i]      = BigQold.segment(startIdx, segmentSize);
+        Qnew_vec[i]      = BigQnew.segment(startIdx, segmentSize);
+    }
+    
+    std::vector<MatrixXd> Mold_vec(numSegments, MatrixXd::Zero(segmentSize, segmentSize));
+    std::vector<MatrixXd> Mnew_vec(numSegments, MatrixXd::Zero(segmentSize, segmentSize));
+    std::vector<MatrixXd> Nold_vec(numSegments, MatrixXd::Zero(segmentSize, segmentSize));
+    std::vector<MatrixXd> Nnew_vec(numSegments, MatrixXd::Zero(segmentSize, segmentSize));
 
-        // 创建新的稀疏矩阵，存储块
-        Nold[i] = Eigen::SparseMatrix<double>(length, length);
-        Nnew[i] = Eigen::SparseMatrix<double>(length, length);
+    auto extractBlocks = [&](const SparseMatrix<double>& BigMat, std::vector<MatrixXd>& targetVec) {
+        for (int k = 0; k < BigMat.outerSize(); ++k) {
+            for (SparseMatrix<double>::InnerIterator it(BigMat, k); it; ++it) {
+                int r = it.row();
+                int c = it.col();
+                
+                int blockRow = r / segmentSize;
+                int blockCol = c / segmentSize;
 
-        // 通过遍历 Nold 提取块
-        for (int knold = startIdx; knold < startIdx + length; ++knold) {
-            for (Eigen::SparseMatrix<double>::InnerIterator it(AA.Nold(), knold); it; ++it) {
-                if (it.row() >= startIdx && it.row() < startIdx + length && it.col() >= startIdx && it.col() < startIdx + length) {
-                    Nold[i].coeffRef(it.row() - startIdx, it.col() - startIdx) = it.value();
+                if (blockRow == blockCol && blockRow < numSegments) {
+                    targetVec[blockRow](r % segmentSize, c % segmentSize) = it.value();
                 }
             }
         }
+    };
 
-        // 通过遍历 Nnew 提取块
-        for (int knnew = startIdx; knnew < startIdx + length; ++knnew) {
-            for (Eigen::SparseMatrix<double>::InnerIterator it(AA.Nnew(), knnew); it; ++it) {
-                if (it.row() >= startIdx && it.row() < startIdx + length && it.col() >= startIdx && it.col() < startIdx + length) {
-                    Nnew[i].coeffRef(it.row() - startIdx, it.col() - startIdx) = it.value();
-                }
-            }
-        }
+    extractBlocks(BigMold, Mold_vec);
+    extractBlocks(BigMnew, Mnew_vec);
+    extractBlocks(BigNold, Nold_vec);
+    extractBlocks(BigNnew, Nnew_vec);
+
+    std::vector<VectorXd> temp(numSegments - 1, VectorXd(segmentSize));
+
+    double dT = deltaT;
+    double dS = deltaS;
+    double dTdS = deltaT * deltaS;
+
+    for (int i = 0; i < numSegments - 1; i++) {
+        temp[i] = ((Nnew_vec[i] + Nnew_vec[i+1]) * (Ynew_segments[i+1] - Ynew_segments[i]) * dT)
+                + ((Nold_vec[i] + Nold_vec[i+1]) * (Yold_segments[i+1] - Yold_segments[i]) * dT)
+                + ((Mnew_vec[i+1] + Mold_vec[i+1]) * (Ynew_segments[i+1] - Yold_segments[i+1]) * dS)
+                + ((Mnew_vec[i] + Mold_vec[i]) * (Ynew_segments[i] - Yold_segments[i]) * dS)
+                + ((Qold_vec[i] + Qold_vec[i+1] + Qnew_vec[i] + Qnew_vec[i+1]) * dTdS);
     }
 
-    // SPDLOG_DEBUG("FX LOG 2");
-
-    // 存储 Qold 和 Qnew 向量
-    std::vector<VectorXd> Qold(numSegments, VectorXd(segmentSize));
-    std::vector<VectorXd> Qnew(numSegments, VectorXd(segmentSize));
-
-    // 填充 Qold 和 Qnew 向量
-    for (int i = 0; i < numSegments; ++i) {
-        int startIdx = i * segmentSize;
-        if (i < numSegments - 1) {
-            Qold[i] = AA.Qold().segment(startIdx, segmentSize);
-            Qnew[i] = AA.Qnew().segment(startIdx, segmentSize);
-        } else {
-            Qold[i] = AA.Qold().tail(segmentSize);
-            Qnew[i] = AA.Qnew().tail(segmentSize);
-        }
-    }
-
-    // SPDLOG_DEBUG("FX LOG 3");
-    // 创建一个 temp 数组存储每个计算结果
-    std::vector<VectorXd> temp(numSegments-1, VectorXd(segmentSize));
-
-    // 计算每个 temp 向量的值
-    for (int i = 0; i < numSegments-1; i++) {
-            temp[i] = ((Nnew[i] + Nnew[i+1]) * (Ynew_segments[i+1] - Ynew_segments[i]) * deltaT)
-                    + ((Nold[i] + Nold[i+1]) * (Yold_segments[i+1] - Yold_segments[i]) * deltaT)
-                    + ((Mnew[i+1] + Mold[i+1]) * (Ynew_segments[i+1] - Yold_segments[i+1]) * deltaS)
-                    + ((Mnew[i] + Mold[i]) * (Ynew_segments[i] - Yold_segments[i]) * deltaS)
-                    + ((Qold[i] + Qold[i+1] + Qnew[i] + Qnew[i+1]) * (deltaT * deltaS));
-    }
-
-    // SPDLOG_DEBUG("FX LOG 4");
-
-    // 定义一个计算 BCtemp 的 lambda 函数
-        auto calculate_BCtemp = [](const VectorXd& Ynew, double Vx, double Vy, double Vz) {
+    auto calculate_BCtemp = [](const VectorXd& YVec, double Vx_in, double Vy_in, double Vz_in) {
         VectorXd BCtemp(5);
-        double cos_theta = cos(Ynew(6));
-        double sin_theta = sin(Ynew(6));
-        double cos_phi = cos(Ynew(7));
-        double sin_phi = sin(Ynew(7));
+        double cos_theta = cos(YVec(6));
+        double sin_theta = sin(YVec(6));
+        double cos_phi = cos(YVec(7));
+        double sin_phi = sin(YVec(7));
 
-        BCtemp(0) = Ynew(0) - (Vx * cos_phi * cos_theta + Vy * cos_theta * sin_phi - Vz * sin_theta);
-        BCtemp(1) = Ynew(1) - (Vy * cos_phi - Vx * sin_phi);
-        BCtemp(2) = Ynew(2) - (Vx * cos_phi * sin_theta + Vy * sin_theta * sin_phi + Vz * cos_theta);
-        BCtemp(3) = Ynew(8);
-        BCtemp(4) = Ynew(9);
+        BCtemp(0) = YVec(0) - (Vx_in * cos_phi * cos_theta + Vy_in * cos_theta * sin_phi - Vz_in * sin_theta);
+        BCtemp(1) = YVec(1) - (Vy_in * cos_phi - Vx_in * sin_phi);
+        BCtemp(2) = YVec(2) - (Vx_in * cos_phi * sin_theta + Vy_in * sin_theta * sin_phi + Vz_in * cos_theta);
+        BCtemp(3) = YVec(8);
+        BCtemp(4) = YVec(9);
         return BCtemp;
     };
 
-    // 计算 BCtemp0 和 BCtemp1
     VectorXd BCtemp0 = calculate_BCtemp(Ynew_segments[0], Vtx, Vty, Vtz);
     VectorXd BCtemp1 = calculate_BCtemp(Ynew_segments[numSegments-1], Vbx, Vby, Vbz);
-    // SPDLOG_DEBUG("FX LOG 5");
 
-    // 创建最终的返回向量 ret
-    VectorXd ret(numSegments*segmentSize);
-    
-    // 将前五个元素赋值为 BCtemp0，尾部五个元素赋值为 BCtemp1
+
+    VectorXd ret(numSegments * segmentSize);
     ret.head(5) = BCtemp0;
+    
+    for (int i = 0; i < numSegments - 1; i++) {
+        int startIdx = 5 + i * segmentSize;
+        ret.segment(startIdx, segmentSize) = temp[i];
+    }
+
     ret.tail(5) = BCtemp1;
 
-    // ret.head(5).setZero();
-    // ret.tail(5).setZero();
-
-    // 使用循环简化 segment 的赋值操作
-    for (int i = 0; i < numSegments-1; i++) {
-        int startIdx = 5 + i * segmentSize;
-        int length = segmentSize;
-
-        ret.segment(startIdx, length) = temp[i];  // 确保赋值的长度为 length
-    }
-    SPDLOG_DEBUG("FX LOG 6");
+    // SPDLOG_DEBUG("FX Calculation Complete");
     return ret;
 }
-
-
-

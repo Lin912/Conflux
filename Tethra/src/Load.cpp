@@ -19,5 +19,5 @@ VectorXd Load::LF(int k) {
 SparseMatrix<double> Load::LJ(int k) {
   SPDLOG_DEBUG("Calculating LJ for index {}", k);
   Jacobian A(Yold, Ynew, k);
-  return A.jacobian();
+  return A.jacobian_NDM();
 }

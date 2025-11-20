@@ -8,6 +8,8 @@
 #include "ReadOut.h"
 #include "ParaReader.h"
 #include "Nums.h"
+#include <spdlog/spdlog.h>
+#include "Fx.h"
 
 class Jacobian
 {
@@ -64,12 +66,13 @@ class Jacobian
         
 
     public:
-        Jacobian(VectorXd& arr, VectorXd& brr, int index);
+        Jacobian(const VectorXd &arr, const VectorXd &brr, int index);
         ~Jacobian();
 
         int sign(double a);
         
         //double D(double a);
-        SparseMatrix<double> jacobian();
+        SparseMatrix<double> jacobian_HC();
+        SparseMatrix<double> jacobian_NDM();
 
 };

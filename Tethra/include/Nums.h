@@ -7,12 +7,13 @@ constexpr int TnoV = 1000;  //TnoV = Nodes* Variables
 
 
 //Fiber.cpp
-constexpr int times = 300;  //Iterate Times
-constexpr double Error = 1e-15;
+constexpr int times = 200;  //Iterate Times
+constexpr double Error = 1e-08;
+constexpr double InpError = 1e-03;
 constexpr double DelTime = 0.001;
 constexpr int TimeStep = 20000;
 constexpr int TotNoV = 1000;    //TotNoV = TnoV
 
-constexpr int THREADS = 32;      //Threads of Eigen
+constexpr int THREADS = 64;      //Threads of Eigen
 
 

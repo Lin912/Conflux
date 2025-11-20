@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 
+using namespace Eigen;
 
 MNQ::MNQ(const VectorXd &arr, const VectorXd &brr, int index)
     : Yold(arr), Ynew(brr) {
@@ -46,11 +47,6 @@ MNQ::MNQ(const VectorXd &arr, const VectorXd &brr, int index)
   Ax = physicalData.Ax;
   Ay = physicalData.Ay;
   Az = physicalData.Az;
-
-//   Timestep = physicalData.TS;
-//   Nodes = physicalData.NODES;
-//   Variables = physicalData.VARIABLES;
-//   TnoV = physicalData.TNOV;
 }
 
 MNQ::~MNQ() {}
@@ -58,6 +54,8 @@ MNQ::~MNQ() {}
 Eigen::SparseMatrix<double> MNQ::CreateSparseMatrix(const Eigen::VectorXd &Y) {
   Eigen::SparseMatrix<double> temp(TnoV, TnoV);
   std::vector<Eigen::Triplet<double>> triplets;
+
+  triplets.reserve(Nodes * 20);
 
   for (int i = 0; i < Nodes; i++) {
     int idx0 = i * 10 + 0;
@@ -68,7 +66,7 @@ Eigen::SparseMatrix<double> MNQ::CreateSparseMatrix(const Eigen::VectorXd &Y) {
     int idx5 = i * 10 + 5;
     int idx6 = i * 10 + 6;
     int idx7 = i * 10 + 7;
-    // int idx8 = i * 10 + 8;
+    int idx8 = i * 10 + 8;
     int idx9 = i * 10 + 9;
 
     double cos_theta = std::cos(Y(idx6));
@@ -97,11 +95,11 @@ Eigen::SparseMatrix<double> MNQ::CreateSparseMatrix(const Eigen::VectorXd &Y) {
         -M * Y(idx1) * sin_theta + ma * Vx * sin_phi * sin_theta -
             ma * Vy * cos_phi * sin_theta));
 
-    triplets.push_back(Eigen::Triplet<double>(idx3, idx3, 1 / (A * E)));
+    triplets.push_back(Eigen::Triplet<double>(idx3, idx3, 1.0 / (A * E)));
     triplets.push_back(Eigen::Triplet<double>(
-        idx4, idx7, cos_theta * (Y(idx3) / (A * E) + 1)));
+        idx4, idx7, cos_theta * (Y(idx3) / (A * E) + 1.0)));
     triplets.push_back(
-        Eigen::Triplet<double>(idx5, idx6, Y(idx3) / (A * E) + 1));
+        Eigen::Triplet<double>(idx5, idx6, Y(idx3) / (A * E) + 1.0));
   }
 
   temp.setFromTriplets(triplets.begin(), triplets.end());
@@ -114,6 +112,8 @@ Eigen::SparseMatrix<double> MNQ::Mnew() { return CreateSparseMatrix(Ynew); }
 Eigen::SparseMatrix<double> MNQ::CreateSparseNMatrix(const Eigen::VectorXd &Y) {
   Eigen::SparseMatrix<double> temp(TnoV, TnoV);
   std::vector<Eigen::Triplet<double>> triplets;
+
+  triplets.reserve(Nodes * 15);
 
   for (int i = 0; i < Nodes; i++) {
     int idx0 = i * 10 + 0;
@@ -162,41 +162,46 @@ Eigen::VectorXd MNQ::CreateQVector(const Eigen::VectorXd &Y) {
     int idx8 = i * 10 + 8;
     int idx9 = i * 10 + 9;
 
+    double strain_term = sqrt(Y(idx3) / (A * E) + 1.0);
+    double cos_theta = cos(Y(idx6));
+    double sin_theta = sin(Y(idx6));
+    double cos_phi = cos(Y(idx7));
+    double sin_phi = sin(Y(idx7));
+    
+    double Vr_x = Y(idx0) + Vz * sin_theta - Vx * cos_phi * cos_theta - Vy * cos_theta * sin_phi;
+    double Vr_y = Y(idx1) - Vy * cos_phi + Vx * sin_phi;
+    double Vr_z = Vz * cos_theta - Y(idx2) + Vx * cos_phi * sin_theta + Vy * sin_phi * sin_theta;
+    
+    double V_norm_sq = Vr_y*Vr_y + Vr_z*Vr_z;
+    double V_norm = sqrt(V_norm_sq);
+    
+    //double strain_term_cubed = pow(strain_term, 6); 
+    double term_pow3 = pow(Y(idx3) / (A * E) + 1.0, 3);
+
     temp(idx0) =
-          Y(idx9) * Y(idx4) - Y(idx8) * Y(idx5) + Gz * sin(Y(idx6)) -
-          Gx * cos(Y(idx7)) * cos(Y(idx6)) - Gy * cos(Y(idx6)) * sin(Y(idx7)) +
-          0.5 * Cdt * d0 * pi * rho *
-          abs(Y(idx0) + Vz * sin(Y(idx6)) - Vx * cos(Y(idx7)) * cos(Y(idx6)) -Vy * cos(Y(idx6)) * sin(Y(idx7))) *
-          sqrt(Y(idx3) / (A * E) + 1) *
-          (Y(idx0) + Vz * sin(Y(idx6)) - Vx * cos(Y(idx7)) * cos(Y(idx6)) -Vy * cos(Y(idx6)) * sin(Y(idx7)));
+          Y(idx9) * Y(idx4) - Y(idx8) * Y(idx5) + Gz * sin_theta -
+          Gx * cos_phi * cos_theta - Gy * cos_theta * sin_phi +
+          0.5 * Cdt * d0 * pi * rho * abs(Vr_x) * strain_term * Vr_x;
+          
     temp(idx1) =
-          Gx * sin(Y(idx7)) - Gy * cos(Y(idx7)) - Y(idx9) * Y(idx3) -
+          Gx * sin_phi - Gy * cos_phi - Y(idx9) * Y(idx3) -
           Y(idx9) * Y(idx5) * tan(Y(idx6)) +
-          0.5 * Cdn * d0 * rho * sqrt(Y(idx3) / (A * E) + 1) *
-          sqrt(pow((Y(idx1) - Vy * cos(Y(idx7)) + Vx * sin(Y(idx7))), 2) +
-               pow((Vz * cos(Y(idx6)) - Y(idx2) +Vx * cos(Y(idx7)) * sin(Y(idx6)) + Vy * sin(Y(idx7)) * sin(Y(idx6))),2)) *
-          (Y(idx1) - Vy * cos(Y(idx7)) + Vx * sin(Y(idx7)));
+          0.5 * Cdn * d0 * rho * strain_term * V_norm * Vr_y;
+          
     temp(idx2) =
-          Y(idx8) * Y(idx3) - Gz * cos(Y(idx6)) -
-          Gx * cos(Y(idx7)) * sin(Y(idx6)) - Gy * sin(Y(idx7)) * sin(Y(idx6)) +
-          Y(idx9) * Y(idx4) * tan(Y(idx6)) - 0.5 * Cdb * d0 * rho * sqrt(Y(idx3) / (A * E) + 1) *
-          sqrt(pow((Y(idx1) - Vy * cos(Y(idx7)) + Vx * sin(Y(idx7))), 2) +
-                  pow((Vz * cos(Y(idx6)) - Y(idx2) + Vx * cos(Y(idx7)) * sin(Y(idx6)) + Vy * sin(Y(idx7)) * sin(Y(idx6))),2)) *
-          (Vz * cos(Y(idx6)) - Y(idx2) + Vx * cos(Y(idx7)) * sin(Y(idx6)) + Vy * sin(Y(idx7)) * sin(Y(idx6)));
-    temp(idx3) = 
-          Y(idx9) * Y(idx1) - Y(idx8) * Y(idx2);
-    temp(idx4) = 
-          -Y(idx9) * Y(idx0) - Y(idx9) * Y(idx2) * tan(Y(idx6));
-    temp(idx5) = 
-          -Y(idx8) * Y(idx0) - Y(idx9) * Y(idx1) * tan(Y(idx6));
-    temp(idx6) = 
-          E * I * pow(Y(idx9), 2) * tan(Y(idx6)) - Y(idx5) * pow((Y(idx3) / (A * E) + 1), 3);
-    temp(idx7) = 
-          Y(idx4) * pow((Y(idx3) / (A * E) + 1), 3) - E * I * Y(idx8) * Y(idx9) * tan(Y(idx6));
-    temp(idx8) = 
-          -Y(idx8);
-    temp(idx9) = 
-          -Y(idx9);
+          Y(idx8) * Y(idx3) - Gz * cos_theta -
+          Gx * cos_phi * sin_theta - Gy * sin_phi * sin_theta +
+          Y(idx9) * Y(idx4) * tan(Y(idx6)) - 
+          0.5 * Cdb * d0 * rho * strain_term * V_norm * Vr_z;
+          
+    temp(idx3) = Y(idx9) * Y(idx1) - Y(idx8) * Y(idx2);
+    temp(idx4) = -Y(idx9) * Y(idx0) - Y(idx9) * Y(idx2) * tan(Y(idx6));
+    temp(idx5) = -Y(idx8) * Y(idx0) - Y(idx9) * Y(idx1) * tan(Y(idx6));
+    
+    temp(idx6) = E * I * pow(Y(idx9), 2) * tan(Y(idx6)) - Y(idx5) * term_pow3;
+    temp(idx7) = Y(idx4) * term_pow3 - E * I * Y(idx8) * Y(idx9) * tan(Y(idx6));
+    temp(idx8) = -Y(idx8);
+    temp(idx9) = -Y(idx9);
   }
   return temp;
 }

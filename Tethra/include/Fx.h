@@ -27,7 +27,7 @@ private:
   int k;
 
 public:
-  Fx(VectorXd &arr, VectorXd &brr, int index);
+  Fx(const VectorXd &arr, const VectorXd &brr, int index);
   ~Fx();
   VectorXd fx();
 };
