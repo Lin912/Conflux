@@ -27,7 +27,7 @@ data_new = np.zeros((20000, Tck.shape[1]))
 
 # 完全向量化的积分计算
 def compute_integrals_vectorized(data):
-    h = 0.001
+    h = 0.002
     n_rows, n_cols = data.shape
     
     # Simpson积分 (从第3个点开始)
@@ -144,7 +144,7 @@ if len(Xr) > 0:
         if len(x) > 1:  # 确保有足够的数据点
             # 只为开始、中间、结束的时间点添加标签
             if i == 0 or i == len(Xr)//2 or i == len(Xr)-1:
-                label = f't={time_indices[i]*0.001:.1f}s'
+                label = f't={time_indices[i]*0.002:.1f}s'
             else:
                 label = None
             ax.plot(x, y, z, color=color, alpha=0.8, linewidth=1.2, label=label)
@@ -153,13 +153,13 @@ if len(Xr) > 0:
     if len(Xc) > 1:
         ax.plot(Xc, Yc, Zc, linestyle="--", color="#B3112F", linewidth=2.5, label='Center Point Trajectory')
 
-        ax.set_xlim(-25.0, 5.0)     # X 轴范围
-        ax.set_ylim(-0.50, 0.50)   # Y 轴范围
-        ax.set_zlim(-0.20, 1.0)     # Z 轴范围
+        ax.set_xlim(-25.00, 5.00)     # X 轴范围
+        ax.set_ylim(-2.00, 2.50)   # Y 轴范围
+        ax.set_zlim(-2.00, 2.50)     # Z 轴范围
         
         ax.set_xticks(np.arange(-25.0, 7.00, 2.00))
-        ax.set_yticks(np.arange(-0.50, 0.60,  0.10))
-        ax.set_zticks(np.arange(-0.20, 1.20,  0.20))
+        ax.set_yticks(np.arange(-2.00, 2.50,  0.50))
+        ax.set_zticks(np.arange(-2.00, 2.50,  0.50))
        
         # 如需自定义刻度标签格式，手动给字符串
         ax.set_xticklabels([f"{v:.1f}" for v in ax.get_xticks()])
@@ -221,7 +221,7 @@ if len(Xr) > 0:
     
     # 添加颜色条
     sm = plt.cm.ScalarMappable(cmap='viridis', 
-                              norm=plt.Normalize(0, time_indices[-1]*0.001))
+                              norm=plt.Normalize(0, time_indices[-1]*0.002))
     sm.set_array([])
     cbar = plt.colorbar(sm, ax=ax, shrink=0.7, pad=0.1)
     cbar.set_label('Time (s)', rotation=270, labelpad=20, fontsize=13)

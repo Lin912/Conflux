@@ -34,7 +34,7 @@ data_Vel[0, :] = 0
 print("No need to integrate...")
 
 # 时间轴生成
-t = np.arange(0.001, 20.001, 0.001)  # TimeStep
+t = np.arange(0.002, 40.002, 0.002)  # TimeStep
 
 # 提取数据绘图
 X1, X100 = data_Vel[:, 0], data_Vel[:, 297]
@@ -55,10 +55,10 @@ colors = {
 def plot_displacement(t, data, title, subplot_pos, color):
     plt.subplot(2, 3, subplot_pos)
     plt.plot(t, data, '-', linewidth=2.0, color = color)
-    plt.xlim([0, 4])
-    plt.ylim([-0.5, 0.5])
-    plt.xticks(np.arange(0, 4.5, 0.5))
-    plt.yticks(np.arange(-0.5, 0.60, 0.10))
+    plt.xlim([0, 8])
+    plt.ylim([-2.0, 2.0])
+    plt.xticks(np.arange(0, 8.5, 0.5))
+    plt.yticks(np.arange(-2.0, 2.50, 0.50))
     plt.title(title, fontsize=12)
     plt.xlabel("Time(s)")
     plt.ylabel("Velocity(m)")

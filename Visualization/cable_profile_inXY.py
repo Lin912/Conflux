@@ -28,7 +28,7 @@ data_new = np.zeros((20000, 300))
 
 # 完全向量化的Simpson积分函数
 def v_int_Sim_fully_vectorized(data):
-    h = 0.001  # TimeStep
+    h = 0.002  # TimeStep
     n_points = data.shape[0]
     n_columns = data.shape[1]
     
@@ -50,7 +50,7 @@ def v_int_Sim_fully_vectorized(data):
 
 # 完全向量化的梯形积分函数
 def v_int_tra_fully_vectorized(data):
-    h = 0.001  # TimeStep
+    h = 0.002  # TimeStep
     n_points = data.shape[0]
     n_columns = data.shape[1]
     
@@ -83,7 +83,7 @@ data_new[0, :] = 0  # 第一个点为0
 print("Integral Over!")
 
 # 时间轴生成
-t = np.arange(0.001, 20.001, 0.001)  # TimeStep
+t = np.arange(0.002, 40.002, 0.002)  # TimeStep
 
 # 提取数据绘图
 X1, X100 = data_new[:, 0], data_new[:, 297]
@@ -104,10 +104,10 @@ colors = {
 def plot_displacement(t, data, title, subplot_pos, color):
     plt.subplot(2, 3, subplot_pos)
     plt.plot(t, data, '-', linewidth=1.6, color = color)
-    plt.xlim([0, 4])
-    plt.ylim([-0.2, 0.2])
-    plt.xticks(np.arange(0, 4.5, 0.5))
-    plt.yticks(np.arange(-0.2, 0.25, 0.05))
+    plt.xlim([0, 8])
+    plt.ylim([-2.0, 2.0])
+    plt.xticks(np.arange(0, 8.5, 0.5))
+    plt.yticks(np.arange(-2.00, 2.40, 0.40))
     plt.title(title, fontsize=12)
     plt.xlabel("Time(s)")
     plt.ylabel("Displacement(m)")

@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
+import matplotlib as mpl 
 import matplotlib.pyplot as plt
 import os
 
@@ -35,7 +35,7 @@ else:
     Fx = Fy = Fz = np.zeros((num_rows, n_points))
 
 # 时间数组
-t = np.linspace(0.001, 20.001, num_rows, endpoint=False)
+t = np.linspace(0.002, 40.002, num_rows, endpoint=False)
 
 # 选择要绘制的点
 points_to_plot = [0, 49, 99]  # point: 1, 50, 100
@@ -63,17 +63,17 @@ for col_idx, (point_idx, point_name, color) in enumerate(zip(points_to_plot, poi
     # 第一行: Fx (张力)
     plot_subplot(axs[0, col_idx], t, Fx[:, point_idx], 
                 f"FX at {point_name}", "Time(s)", "FX(N)", 
-                [0, 5], [-60, 60], color)
+                [0, 8], [-200, 200], color)
     
     # 第二行: Fy
     plot_subplot(axs[1, col_idx], t, Fy[:, point_idx], 
                 f"FY at {point_name}", "Time(s)", "FY(N)", 
-                [0, 5], [-6.0, 6.0], color)
+                [0, 8], [-20.0, 20.0], color)
     
     # 第三行: Fz
     plot_subplot(axs[2, col_idx], t, Fz[:, point_idx], 
                 f"FZ at {point_name}", "Time(s)", "FZ(N)", 
-                [0, 5], [-4.0, 4.0], color)
+                [0, 8], [-20.0, 20.0], color)
 
 # 调整布局
 plt.tight_layout()
