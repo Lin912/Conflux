@@ -85,6 +85,21 @@ print("Integral Over!")
 # 时间轴生成
 t = np.arange(0.002, 40.002, 0.002)  # TimeStep
 
+print("Saving processed data to CSV...")
+
+# 方案 1: 将时间轴(t)作为第一列，data_new 作为后续列合并保存
+# t.reshape(-1, 1) 将时间数组转换为列向量以便拼接
+combined_data = np.hstack((t.reshape(-1, 1), data_new))
+
+# 定义保存路径
+save_path = 'output/Data/calculated_displacement.csv'
+
+# 保存为CSV
+# fmt='%.6f' 保留6位小数，可根据需要调整精度
+np.savetxt(save_path, combined_data, delimiter=',', fmt='%.6f')
+
+print(f"Data saved to {save_path}")
+
 # 提取数据绘图
 X1, X100 = data_new[:, 0], data_new[:, 297]
 Y1, Y100 = data_new[:, 1], data_new[:, 298]
@@ -104,9 +119,9 @@ colors = {
 def plot_displacement(t, data, title, subplot_pos, color):
     plt.subplot(2, 3, subplot_pos)
     plt.plot(t, data, '-', linewidth=1.6, color = color)
-    plt.xlim([0, 8])
+    plt.xlim([0, 20])
     plt.ylim([-2.0, 2.0])
-    plt.xticks(np.arange(0, 8.5, 0.5))
+    plt.xticks(np.arange(0, 22.0, 2.0))
     plt.yticks(np.arange(-2.00, 2.40, 0.40))
     plt.title(title, fontsize=12)
     plt.xlabel("Time(s)")

@@ -3,7 +3,7 @@ import os
 
 start = 0
 end = 20
-step = 0.001
+step = 0.002
 
 os.makedirs('Timestep_axis', exist_ok=True)
 data = [round(i * step, 3) for i in range(int(start / step), int(end / step) + 1)]

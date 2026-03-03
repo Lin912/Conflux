@@ -63,17 +63,17 @@ for col_idx, (point_idx, point_name, color) in enumerate(zip(points_to_plot, poi
     # 第一行: Fx (张力)
     plot_subplot(axs[0, col_idx], t, Tension[:, point_idx], 
                 f"Tension at {point_name}", "Time(s)", "Tension(N)", 
-                [0, 8], [-200, 200], color)
+                [0, 20], [-200, 200], color)
     
     # 第二行: Fy
     plot_subplot(axs[1, col_idx], t, Fn[:, point_idx], 
                 f"Force_in_normal at {point_name}", "Time(s)", "Fn(N)", 
-                [0, 8], [-20.0, 20.0], color)
+                [0, 20], [-20.0, 20.0], color)
     
     # 第三行: Fz
     plot_subplot(axs[2, col_idx], t, Fb[:, point_idx], 
                 f"Force_in_bi-normal at {point_name}", "Time(s)", "Fb(N)", 
-                [0, 8], [-20.0, 20.0], color)
+                [0, 20], [-20.0, 20.0], color)
 
 # 调整布局
 plt.tight_layout()

@@ -55,9 +55,9 @@ colors = {
 def plot_displacement(t, data, title, subplot_pos, color):
     plt.subplot(2, 3, subplot_pos)
     plt.plot(t, data, '-', linewidth=2.0, color = color)
-    plt.xlim([0, 8])
+    plt.xlim([0, 20])
     plt.ylim([-2.0, 2.0])
-    plt.xticks(np.arange(0, 8.5, 0.5))
+    plt.xticks(np.arange(0, 22.0, 2.0))
     plt.yticks(np.arange(-2.0, 2.50, 0.50))
     plt.title(title, fontsize=12)
     plt.xlabel("Time(s)")
