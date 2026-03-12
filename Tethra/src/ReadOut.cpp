@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../csv/TopVel4_A0.5_T2.0_Z0.40_20s_Horizional/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+    : fileTopVel("../csv/TopVel4_A0.5_T2.0_Z0.40_20s_Vertical/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
       fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
       fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
       fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),
@@ -457,7 +457,7 @@ void FiberRO::OutTopforce(VectorXd v) {
 
 void FiberRO::OutBottomforce(VectorXd v) {
   // SPDLOG_DEBUG("Outputting the bottom force to file");
-  ofstream outfileBottomforce(Bottomforceout, ios::trunc);
+  //ofstream outfileBottomforce(Bottomforceout, ios::trunc);
 
   MatrixXd aa(1, 3);
   aa(0, 0) = v(TnoV-7); // Ft
@@ -479,15 +479,32 @@ void FiberRO::OutBottomforce(VectorXd v) {
   MatrixXd bb(1, 3);
 //   bb = aa * tpmat.transpose();
   bb = aa * tpmat;
-  outfileBottomforce << bb;
-  outfileBottomforce.close();
+  if (g_sharedData) {
+        g_sharedData->forceX = bb(0, 0);
+        g_sharedData->forceY = bb(0, 1);
+        g_sharedData->forceZ = bb(0, 2);
+	} 
+  //outfileBottomforce << bb;
+  //outfileBottomforce.close();
 }
 
 vector<double> FiberRO::ReadBottomVel() {
-  vector<double> velocityRelative =
-      readLastLineData(fileBottomVelocityRelative);
-  vector<double> omegaRelative = readLastLineData(fileBottomomegaRelative);
-  vector<double> Eulerangle = readLastLineData(fileBottomEulerAngle);
+  vector<double> velocityRelative(3, 0.0);
+  vector<double> omegaRelative(3, 0.0);
+  vector<double> Eulerangle(3, 0.0);
+  if (g_sharedData) {
+        velocityRelative[0] = g_sharedData->vrx;
+        velocityRelative[1] = g_sharedData->vry;
+        velocityRelative[2] = g_sharedData->vrz;
+
+        omegaRelative[0] = g_sharedData->omegarx;
+        omegaRelative[1] = g_sharedData->omegary;
+        omegaRelative[2] = g_sharedData->omegarz;
+
+        Eulerangle[0] = g_sharedData->rx;
+        Eulerangle[1] = g_sharedData->ry;
+        Eulerangle[2] = g_sharedData->rz;
+	}
   ////////////////////////////////////////////////////Towingpoint Position
   vector<double> R = {-0.220, 0.000, -0.00497};
   ////////////////////////////////////////////////////Towingpoint Position
@@ -514,8 +531,6 @@ vector<double> FiberRO::ReadBottomVel() {
       arrdata[i] += E[i][j] * brrdata[j];
     }
   }
-  // swap(arrdata[1], arrdata[2]);
-  // swap(arrdata[0], arrdata[1]);
   return arrdata;
 }
 

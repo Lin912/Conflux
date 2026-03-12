@@ -13,12 +13,36 @@
 #include <filesystem>
 #include <array>
 #include "Nums.h"
-
-
+#include <cstdint>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+
+#pragma pack(push, 1) 
+struct ControlDirect {
+    int32_t OFFSET_PROGRAM_STARCCM; // 0-3
+    int32_t OFFSET_PROGRAM_CITRINE; // 4-7
+    
+    double forceX;
+    double forceY;
+    double forceZ;
+    
+    double vrx;
+    double vry;
+    double vrz;
+    double omegarx;
+    double omegary;
+    double omegarz;
+    double rx;
+    double ry;
+    double rz;
+    
+    char padding[928];
+};
+#pragma pack(pop)
+extern ControlDirect* g_sharedData;
 
 using namespace std;
 using namespace Eigen;

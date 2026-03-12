@@ -3,18 +3,34 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <cstdint>
 
 using namespace std;
 
+#pragma pack(push, 1)
 struct ControlDirect {
-    int OFFSET_PROGRAM_STARCCM;
-    int OFFSET_PROGRAM_CITRINE;
-    char data[1024];
+    int32_t OFFSET_PROGRAM_STARCCM;
+    int32_t OFFSET_PROGRAM_CITRINE;
+    
+    double forceX;          // 8-15 
+    double forceY;          // 16-23 
+    double forceZ;          // 24-31 
+    
+    double vrx;        		// 32-39 
+    double vry;             // 40-47 
+    double vrz;             // 48-55 
+    double omegarx;         // 56-63 
+    double omegary;         // 64-71 
+    double omegarz;         // 72-79 
+    double rx;              // 80-87 
+    double ry;              // 88-95 
+    double rz;              // 96-103 
+    
+    char padding[928];
 };
 
 int main()  {
     const char* filename  = "ControlDirect_SharedMemory";
-
 
     int fd = open(filename, O_RDWR | O_CREAT, 0600);
     if(fd == -1){
@@ -35,14 +51,18 @@ int main()  {
         close(fd);
         return 1;
     }
-
-//   Initializer
+	
+	memset(sharedata, 0, sizeof(ControlDirect));
+	
+	// Initializer
     sharedata -> OFFSET_PROGRAM_STARCCM = 1;
     sharedata -> OFFSET_PROGRAM_CITRINE = 0;
+    
+    cout << "[MMF_Creator] Build and Initialzed :)" << endl;
+    cout << "Total: " << sizeof(ControlDirect) << " bit" << endl;
 
-
-
-
+    munmap(sharedata, sizeof(ControlDirect));
+    close(fd);
 
     return 0;
 }
