@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 FiberRO::FiberRO()
-    : fileTopVel("../csv/TopVel4_A0.5_T2.0_Z0.40_20s_Vertical/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
+    : fileTopVel("../csv/TopMotion/velocity_data.csv"), fileObject("../csv/TowedObject.csv"),
       fileBottomVelocityRelative("../../../HydroSimulation/HydroData/VelocityRelative.csv"),
       fileBottomomegaRelative("../../../HydroSimulation/HydroData/omegaRelative.csv"),
       fileBottomEulerAngle("../../../HydroSimulation/HydroData/EulerAngle.csv"),
@@ -493,17 +493,17 @@ vector<double> FiberRO::ReadBottomVel() {
   vector<double> omegaRelative(3, 0.0);
   vector<double> Eulerangle(3, 0.0);
   if (g_sharedData) {
-        velocityRelative[0] = g_sharedData->vrx;
-        velocityRelative[1] = g_sharedData->vry;
-        velocityRelative[2] = g_sharedData->vrz;
+        velocityRelative[0] = g_sharedData->w;
+        velocityRelative[1] = -(g_sharedData->v);
+        velocityRelative[2] = g_sharedData->u;
 
-        omegaRelative[0] = g_sharedData->omegarx;
-        omegaRelative[1] = g_sharedData->omegary;
-        omegaRelative[2] = g_sharedData->omegarz;
+        omegaRelative[0] = g_sharedData->r;
+        omegaRelative[1] = -(g_sharedData->q);
+        omegaRelative[2] = g_sharedData->p;
 
-        Eulerangle[0] = g_sharedData->rx;
-        Eulerangle[1] = g_sharedData->ry;
-        Eulerangle[2] = g_sharedData->rz;
+        Eulerangle[0] = g_sharedData->yaw;
+        Eulerangle[1] = -(g_sharedData->pitch);
+        Eulerangle[2] = g_sharedData->roll;
 	}
   ////////////////////////////////////////////////////Towingpoint Position
   vector<double> R = {-0.220, 0.000, -0.00497};

@@ -19,30 +19,27 @@
 #include <windows.h>
 #endif
 
-
 #pragma pack(push, 1) 
-struct ControlDirect {
-    int32_t OFFSET_PROGRAM_STARCCM; // 0-3
-    int32_t OFFSET_PROGRAM_CITRINE; // 4-7
-    
-    double forceX;
-    double forceY;
-    double forceZ;
-    
-    double vrx;
-    double vry;
-    double vrz;
-    double omegarx;
-    double omegary;
-    double omegarz;
-    double rx;
-    double ry;
-    double rz;
-    
-    char padding[928];
+struct UnifiedControlDirect {
+    int32_t FLAG_STARCCM;   
+    int32_t FLAG_TETHRA;    
+    int32_t FLAG_ROVCTRL;   
+    int32_t PADDING_ALIGN;  
+
+    double timestamp;       
+    double x, y, z;         
+    double roll, pitch, yaw;
+    double u, v, w;         
+    double p, q, r;         
+
+    double rpm_0, rpm_1, rpm_2, rpm_3, rpm_4, rpm_5; 
+    double forceX, forceY, forceZ; 
+
+    char padding[840];
 };
 #pragma pack(pop)
-extern ControlDirect* g_sharedData;
+extern UnifiedControlDirect* g_sharedData;
+
 
 using namespace std;
 using namespace Eigen;

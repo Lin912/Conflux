@@ -6,7 +6,7 @@
 
 struct SharedData {
     int OFFSET_PROGRAM_STARCCM;
-    int OFFSET_PROGRAM_CITRINE;
+    int OFFSET_PROGRAM_ROVCTRL;
     char data[1024];
 };
 
@@ -30,7 +30,7 @@ int main() {
 
     // 打印共享内存中的内容
     std::cout << "STARCCM_turn: " << sharedData->OFFSET_PROGRAM_STARCCM << std::endl;
-    std::cout << "CITRINE_turn: " << sharedData->OFFSET_PROGRAM_CITRINE << std::endl;
+    std::cout << "ROVCTRL_turn: " << sharedData->OFFSET_PROGRAM_ROVCTRL << std::endl;
     std::cout << "data: " << sharedData->data << std::endl;
 
     // sharedData -> OFFSET_PROGRAM_CITRINE = 0;

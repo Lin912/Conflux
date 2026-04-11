@@ -1,0 +1,60 @@
+# rov_config.yaml
+robot:
+  mass_air: 50.0        # 空气中质量 (kg)
+  mass_submerged: 1.642 # 水下质量 (kg)
+  dimensions: [0.660, 0.524, 0.410]
+  cg: [0.000, 0.000, 0.000]
+  
+  thrusters:
+    max_rpm: 2000
+    max_rpm_acceleration: 15000.0 # 电机最大加速度 (rpm/s)
+    deflection_angle_deg: 30
+    radius: 0.060
+  
+  offsets:
+      Bbp: 0.150  # 后推横向
+      Bfp: 0.150  # 前推横向
+      Btp: 0.165  # 顶推横向
+      Lbp: 0.200  # 后推纵向
+      Lfp: 0.200  # 前推纵向
+      Htp: 0.037  # 顶推垂向
+      H0:  0.100  # CG到中心线垂向
+  rpm_sign_map: [-1.0, -1.0, 1.0, 1.0, 1.0, 1.0]
+
+pid:
+  position:
+    kp: [80.0, 50.0, 60.0]
+    ki: [10.0, 5.0, 10.0]
+    kd: [30.0, 30.0, 60.0]
+    max_integral: [50.0, 40.0, 40.0]
+  attitude:
+    kp: [10.0, 50.0, 20.0]
+    ki: [2.0, 5.0, 0.0]
+    kd: [15.0, 50.0, 20.0]
+    max_integral: [15.0, 15.0, 15.0]
+  # 模糊 PID 调谐参数 (Z轴深度控制)
+  fuzzy_z:
+    e_max: 0.01
+    ec_max: 0.05
+    kp_max: 25.0
+    ki_max: 8.0
+    kd_max: 25.0
+  fuzzy_pitch:
+    e_max: 0.01
+    ec_max: 0.05
+    kp_max: 5.0
+    ki_max: 0.5
+    kd_max: 1.0 
+  fuzzy_x:
+    e_max: 0.01
+    ec_max: 0.05
+    kp_max: 30.0
+    ki_max: 5
+    kd_max: 15.0
+  limits:
+    max_force: 200.0
+    max_moment: 50.0
+    static_compensation_z: -10.0 # 垂向静态补偿力 (浮力残差)
+
+system:
+  control_rate: 50.0 # 控制器运算频率 (Hz)
